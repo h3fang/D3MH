@@ -3,6 +3,8 @@
 
 #include <QPainter>
 
+#include "engine/engine.h"
+
 Minimap::Minimap(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Minimap)
@@ -12,7 +14,9 @@ Minimap::Minimap(QWidget *parent) :
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
-    setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint|Qt::Tool);
+    setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint/*|Qt::Tool*/);
+
+    Engine::getInstance();
 }
 
 Minimap::~Minimap()

@@ -17,9 +17,21 @@ CONFIG += c++11
 
 SOURCES += main.cpp\
         minimap.cpp \
-    engine/engine.cpp
+    engine/engine.cpp \
+    engine/memoryreader.cpp \
+    engine/helper.cpp
 
 HEADERS  += minimap.h \
-    engine/engine.h
+    engine/engine.h \
+    engine/objectmanager.h \
+    engine/structs.h \
+    engine/types.h \
+    engine/localdata.h \
+    engine/scene.h \
+    engine/memoryreader.h \
+    engine/helper.h \
+    engine/actor.h
 
 FORMS    += minimap.ui
+
+RC_FILE = default.rc
