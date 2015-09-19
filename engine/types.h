@@ -1,5 +1,5 @@
-#ifndef TYPES
-#define TYPES
+#ifndef D3MH_TYPES_H
+#define D3MH_TYPES_H
 
 namespace D3 {
 
@@ -98,5 +98,5 @@ public:
 
 }
 
-#endif // TYPES
+#endif // D3MH_TYPES_H
 

@@ -1,5 +1,5 @@
-#ifndef LOCALDATA
-#define LOCALDATA
+#ifndef D3MH_LOCALDATA_H
+#define D3MH_LOCALDATA_H
 
 #include "types.h"
 
@@ -23,5 +23,5 @@ struct LocalData{ // sizeof = 0x38
 };
 
 }
-#endif // LOCALDATA
+#endif // D3MH_LOCALDATA_H
 

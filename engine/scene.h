@@ -1,5 +1,5 @@
-#ifndef SCENE
-#define SCENE
+#ifndef D3MH_SCENE_H
+#define D3MH_SCENE_H
 
 #include "types.h"
 
@@ -182,5 +182,5 @@ struct Scene {
 };
 
 }
-#endif // SCENE
+#endif // D3MH_SCENE_H
 

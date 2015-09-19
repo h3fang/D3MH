@@ -1,5 +1,5 @@
-#ifndef ENGINE_H
-#define ENGINE_H
+#ifndef D3MH_ENGINE_H
+#define D3MH_ENGINE_H
 
 #include <vector>
 
@@ -46,9 +46,6 @@ public:
 public:
     ~Engine();
     static Engine *getInstance();
-
-    D3::SnoGroupManager *getSnoGroupManagerById(D3::SnoGroupId id);
-
     void update();
 
 private:
@@ -57,6 +54,7 @@ private:
     Engine& operator=(const Engine &) = delete;
 
     MemoryReader *memoryReader;
+    D3::NavMesh *navMesh;
 };
 
-#endif // ENGINE_H
+#endif // D3MH_ENGINE_H

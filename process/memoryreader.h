@@ -1,5 +1,5 @@
-#ifndef MEMORYREADER_H
-#define MEMORYREADER_H
+#ifndef UTILITIES_MEMORYREADER_H
+#define UTILITIES_MEMORYREADER_H
 
 #include <windows.h>
 
@@ -22,4 +22,4 @@ private:
     DWORD process_id;
 };
 
-#endif // MEMORYREADER_H
+#endif // UTILITIES_MEMORYREADER_H

@@ -1,5 +1,5 @@
-#ifndef D3MH_POINTER_H
-#define D3MH_POINTER_H
+#ifndef UTILITIES_POINTER_H
+#define UTILITIES_POINTER_H
 
 #include <vector>
 
@@ -35,4 +35,4 @@ private:
     MemoryReader *mem_reader;
 };
 
-#endif // D3MH_POINTER_H
+#endif // UTILITIES_POINTER_H

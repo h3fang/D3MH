@@ -1,5 +1,5 @@
-#ifndef ACTOR
-#define ACTOR
+#ifndef D3MH_ACTOR_H
+#define D3MH_ACTOR_H
 
 #include "types.h"
 
@@ -250,5 +250,5 @@ struct Actor{ // sizeof = 0x454
 
 } // namespace D3
 
-#endif // ACTOR
+#endif // D3MH_ACTOR_H
 

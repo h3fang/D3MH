@@ -1,5 +1,5 @@
-#ifndef SNOENUM
-#define SNOENUM
+#ifndef D3MH_SNOENUM_H
+#define D3MH_SNOENUM_H
 
 namespace D3 {
 
@@ -129,5 +129,5 @@ enum SNOGroup : int
 
 }
 
-#endif // SNOENUM
+#endif // D3MH_SNOENUM_H
 

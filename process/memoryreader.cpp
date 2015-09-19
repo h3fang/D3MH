@@ -42,6 +42,7 @@ bool MemoryReader::read(void *buffer, void *src, unsigned int size)
     unsigned long bytesRead = 0;
 
     if(!ReadProcessMemory(process, src, buffer, size, &bytesRead) || bytesRead != size){
+        fprintf(stderr, "Error reading process memory, addr [%#lx]\n", (DWORD)src);
         return false;
     }
 

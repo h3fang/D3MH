@@ -1,5 +1,5 @@
-#ifndef OBJECTMANAGER_H
-#define OBJECTMANAGER_H
+#ifndef D3MH_OBJECTMANAGER_H
+#define D3MH_OBJECTMANAGER_H
 
 #include "types.h"
 #include "scene.h"
@@ -19,5 +19,5 @@ struct ObjectManager{ // sizeof = 0xA10
 
 }
 
-#endif // OBJECTMANAGER_H
+#endif // D3MH_OBJECTMANAGER_H
 

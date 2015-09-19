@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
 #include "structs.h"
 
@@ -28,14 +29,20 @@ public:
     std::vector<NavCell> cells;
 
 public:
-    SceneSnoData(const SnoScene &s);
+    SceneSnoData(int sno_id);
 };
 
 class NavMesh
 {
 public:
-    NavMesh();
-    ~NavMesh();
+    static std::map<DWORD, DWORD> snoSceneIdAddrMap;
+    std::vector<SceneData> sceneData;
+    std::vector<SceneSnoData> sceneSnoData;
+
+public:
+    void update();
+
+    void parseMemorySnoScene();
 
     template<class T>
     static bool getSerializedRecords(std::vector<T> &out, DataPtr2 ptr, DWORD dwBase = 0);

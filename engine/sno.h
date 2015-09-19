@@ -1,5 +1,5 @@
-#ifndef SNO_H
-#define SNO_H
+#ifndef D3MH_SNO_H
+#define D3MH_SNO_H
 
 #include "snoenum.h"
 #include "types.h"
@@ -204,7 +204,10 @@ public:
 class SnoDefinition
 {
 public:
-    DWORD unk[3];               // 0x000
+    int x00_Id;               // 0x000
+    CHAR unk[3];                // 0x004
+    CHAR x07_SnoGroupId;     // 0x007
+    int x08_Size;             // 0x008
     DWORD pSNOAddr;             // 0x00C
 };
 
@@ -242,4 +245,4 @@ public:
 
 } // namespace D3
 
-#endif // SNO_H
+#endif // D3MH_SNO_H

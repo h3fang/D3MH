@@ -49,11 +49,9 @@ void Minimap::paintEvent(QPaintEvent *event)
     p.setPen(Qt::blue);
     p.setFont(QFont("Arial", 16));
 
-    auto frame_count = Pointer<int>()(Addr_ObjectManager, 0x038);
-
     p.drawText(QRectF(0, 0, width(), height()), Qt::AlignCenter,
                QString::asprintf("FrameCnt:%d\nAppLoopCnt:%d\nWorldId:%d\nX:%.4f\nY:%.4f\nZ:%.4f",
-                                 frame_count,
+                                 Pointer<int>()(Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame)),
                                  engine->ApplicationLoopCount,
                                  engine->localData.x0C_WorldSnoId,
                                  engine->localData.x24_WorldPosX,

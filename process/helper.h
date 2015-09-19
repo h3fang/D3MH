@@ -1,5 +1,5 @@
-#ifndef HELPER
-#define HELPER
+#ifndef UTILITIES_HELPER
+#define UTILITIES_HELPER
 
 #include <windows.h>
 
@@ -9,5 +9,5 @@ DWORD GetProcessBaseAddress(DWORD processId, const wchar_t *name);
 bool SetPrivilege( HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
 bool AdjustDebugPrivilege();
 
-#endif // HELPER
+#endif // UTILITIES_HELPER
 
