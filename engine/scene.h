@@ -5,9 +5,10 @@
 
 namespace D3 {
 
-struct Scene{ // sizeof = 0x6C4
+// sizeof = 0x6C4
+struct Scene {
     int x000_Id;
-    int x004_StructStart_Internal_SceneId;
+    int x004_NavMeshId;
     int x008_WorldId;
     int _x00C;
     int _x010;
@@ -16,7 +17,7 @@ struct Scene{ // sizeof = 0x6C4
     int _x01C;
     int _x020;
     int _x024;
-    int _x028;
+    int _x028_PortalWorldSnoId;
     int _x02C;
     int _x030;
     int _x034;
@@ -45,8 +46,8 @@ struct Scene{ // sizeof = 0x6C4
     int _x090;
     int _x094;
     int _x098;
-    int _x09C;
-    int _x0A0;
+    int _x09C_SizeX;
+    int _x0A0_SizeY;
     float x0A4;
     float x0A8;
     float x0AC;
@@ -69,9 +70,9 @@ struct Scene{ // sizeof = 0x6C4
     int _x0F0;
     int _x0F4;
     float x0F8;
-    float x0FC;
-    float x100;
-    float x104;
+    float x0FC_MeshMinX;
+    float x100_MeshMinY;
+    float x104_MeshMinZ;
     float x108;
     float x10C;
     float x110;
@@ -99,8 +100,8 @@ struct Scene{ // sizeof = 0x6C4
     float x168;
     float x16C;
     float x170;
-    float x174;
-    float x178;
+    float x174_MeshMaxX;
+    float x178_MeshMaxY;
     int _x17C;
     int _x180;
     int _x184;

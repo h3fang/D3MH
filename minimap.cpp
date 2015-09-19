@@ -2,8 +2,10 @@
 #include "ui_minimap.h"
 
 #include <QPainter>
+#include <QTimer>
 
 #include "engine/engine.h"
+#include "process/pointer.h"
 
 Minimap::Minimap(QWidget *parent) :
     QWidget(parent),
@@ -16,7 +18,11 @@ Minimap::Minimap(QWidget *parent) :
 
     setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint/*|Qt::Tool*/);
 
-    Engine::getInstance();
+    engine = Engine::getInstance();
+
+    QTimer *t = new QTimer(this);
+    connect(t, SIGNAL(timeout()), this, SLOT(update()));
+    t->start(200);
 }
 
 Minimap::~Minimap()
@@ -28,10 +34,36 @@ void Minimap::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
 
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(100,100,100, 127));
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
 
-    painter.drawRect(0, 0, width(),  height());
+    // draw background
+    p.setPen(Qt::NoPen);
+    p.setBrush(QColor(150, 150, 150, 32));
+
+    p.drawRect(0, 0, width(),  height());
+
+    // update d3 data
+    updateD3Data();
+
+    p.setPen(Qt::blue);
+    p.setFont(QFont("Arial", 16));
+
+    auto frame_count = Pointer<int>()(Addr_ObjectManager, 0x038);
+
+    p.drawText(QRectF(0, 0, width(), height()), Qt::AlignCenter,
+               QString::asprintf("FrameCnt:%d\nAppLoopCnt:%d\nWorldId:%d\nX:%.4f\nY:%.4f\nZ:%.4f",
+                                 frame_count,
+                                 engine->ApplicationLoopCount,
+                                 engine->localData.x0C_WorldSnoId,
+                                 engine->localData.x24_WorldPosX,
+                                 engine->localData.x28_WorldPosY,
+                                 engine->localData.x2C_WorldPosZ));
+}
+
+void Minimap::updateD3Data()
+{
+    if (!engine) return;
+
+    engine->update();
 }

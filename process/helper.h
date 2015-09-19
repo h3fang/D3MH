@@ -4,7 +4,8 @@
 #include <windows.h>
 
 bool GetProcessList();
-HANDLE GetProcessByName(const wchar_t *name);
+DWORD GetProcessIdByName(const wchar_t *name);
+DWORD GetProcessBaseAddress(DWORD processId, const wchar_t *name);
 bool SetPrivilege( HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
 bool AdjustDebugPrivilege();
 

@@ -64,7 +64,7 @@ bool GetProcessList()
     return true;
 }
 
-HANDLE GetProcessByName(const wchar_t *name)
+DWORD GetProcessIdByName(const wchar_t *name)
 {
     DWORD pid = 0;
 
@@ -90,14 +90,66 @@ HANDLE GetProcessByName(const wchar_t *name)
 
     CloseHandle(snapshot);
 
-    if (pid != 0)
+    if (pid == 0)
     {
-        return OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+        fwprintf(stderr, L"No process with name [%s] found\n", name);
     }
 
-    fwprintf(stderr, L"No process with name [%s] found\n", name);
+    return pid;
+}
 
-    return NULL;
+/* Find Base Address of process */
+DWORD GetProcessBaseAddress(DWORD processId, const wchar_t *name)
+{
+    HANDLE moduleSnapshot = INVALID_HANDLE_VALUE;
+    DWORD  processBaseAddress = 0;
+    MODULEENTRY32 moduleEntry;
+
+    /* Take snapshot of all the modules in the process */
+    moduleSnapshot = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE, processId );
+
+    /* Snapshot failed */
+    if( moduleSnapshot == INVALID_HANDLE_VALUE )
+    {
+        fprintf( stderr, "Module Snapshot error\n" );
+        return processBaseAddress;
+    }
+
+    /* Size the structure before usage */
+    moduleEntry.dwSize = sizeof( MODULEENTRY32 );
+
+    /* Retrieve information about the first module */
+    if( !Module32First( moduleSnapshot, &moduleEntry ) )
+    {
+        fprintf( stderr, "First module not found\n" );
+        CloseHandle( moduleSnapshot );
+        return processBaseAddress;
+    }
+
+    /* Find base address */
+
+    do
+    {
+        /* Compare the name of the process to the one we want */
+        if( wcscmp(moduleEntry.szModule, name) == 0 )
+        {
+            /* Save the processID and break out */
+            processBaseAddress = (DWORD)moduleEntry.modBaseAddr;
+            break ;
+        }
+
+    } while( Module32Next( moduleSnapshot, &moduleEntry ) );
+
+
+    if( processBaseAddress == 0 )
+    {
+        fwprintf( stderr, L"Failed to find module %s\n", name );
+    }
+
+    /* Found module and base address successfully */
+    fprintf( stderr, "Base Address: %#lx\n", processBaseAddress );
+    CloseHandle( moduleSnapshot );
+    return processBaseAddress;
 }
 
 

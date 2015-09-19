@@ -1,13 +1,14 @@
 #ifndef TYPES
 #define TYPES
 
-
 namespace D3 {
 
 typedef char CHAR;
 typedef unsigned char UCHAR;
 typedef long LONG;
 typedef unsigned long ULONG;
+typedef unsigned short WORD;
+typedef unsigned int DWORD;
 
 struct Vec2
 {
@@ -20,6 +21,12 @@ struct Vec3
     float x;     // 0x000
     float y;     // 0x004
     float z;     // 0x008
+};
+
+struct AABB
+{
+    Vec3 Base;
+    Vec3 Offset;
 };
 
 struct Vec4

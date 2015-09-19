@@ -7,6 +7,8 @@ namespace Ui {
 class Minimap;
 }
 
+class Engine;
+
 class Minimap : public QWidget
 {
     Q_OBJECT
@@ -17,8 +19,12 @@ public:
 
     void paintEvent(QPaintEvent *event);
 
+private slots:
+    void updateD3Data();
+
 private:
     Ui::Minimap *ui;
+    Engine *engine;
 };
 
 #endif // MINIMAP_H
