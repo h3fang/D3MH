@@ -204,10 +204,10 @@ public:
 class SnoDefinition
 {
 public:
-    int x00_Id;               // 0x000
+    int x00_Id;                 // 0x000
     CHAR unk[3];                // 0x004
-    CHAR x07_SnoGroupId;     // 0x007
-    int x08_Size;             // 0x008
+    CHAR x07_SnoGroupId;        // 0x007
+    DWORD x08_Size;             // 0x008
     DWORD pSNOAddr;             // 0x00C
 };
 
@@ -221,7 +221,7 @@ public:
     int x0C;
     Container<SnoDefinition>* x10_Container;
     Container<void>* x14_Container;
-    int x18_Flags;
+    DWORD x18_Flags;
     char x1C_Name[32];
     SnoGroupId x3C_SnoGroupId;
     int x40;

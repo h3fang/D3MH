@@ -12,6 +12,8 @@ public:
 
     bool read(void *buffer, void *src, unsigned int size);
 
+    DWORD getProcessId() const;
+
 private:
     MemoryReader(const wchar_t *name);
     MemoryReader(MemoryReader&) = delete;

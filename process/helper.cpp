@@ -216,3 +216,30 @@ bool AdjustDebugPrivilege()
 
     return result;
 }
+
+
+HWND FindMainWindow(DWORD process_id)
+{
+    HandleData data;
+    data.process_id = process_id;
+    data.best_handle = 0;
+    EnumWindows(EnumWindowsCallback, (LPARAM)&data);
+    return data.best_handle;
+}
+
+BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
+{
+    HandleData& data = *(HandleData*)lParam;
+    DWORD process_id = 0;
+    GetWindowThreadProcessId(handle, &process_id);
+    if (data.process_id != process_id || !IsMainWindow(handle)) {
+        return TRUE;
+    }
+    data.best_handle = handle;
+    return FALSE;
+}
+
+BOOL IsMainWindow(HWND handle)
+{
+    return GetWindow(handle, GW_OWNER) == (HWND)0 && IsWindowVisible(handle);
+}

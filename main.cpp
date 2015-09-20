@@ -7,12 +7,13 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     Minimap w;
     w.show();
 
     setbuf(stderr, NULL);
 
-    qDebug("sizeof ObjectManager %#x", sizeof(D3::ObjectManager));
+    qDebug("sizeof ObjectManager %#x %#x", sizeof(D3::ObjectManager), offsetof(D3::ObjectManager, x998_Scenes));
     qDebug("sizeof BasicAllocator %#x", sizeof(D3::BasicAllocator<void>));
     qDebug("sizeof Container %#x", sizeof(D3::Container<void>));
     qDebug("sizeof ExpandableContainer %#x", sizeof(D3::ExpandableContainer<void>));

@@ -42,6 +42,7 @@ class Engine
 public:
     D3::LocalData localData;
     int ApplicationLoopCount;
+    D3::NavMesh *navMesh;
 
 public:
     ~Engine();
@@ -54,7 +55,6 @@ private:
     Engine& operator=(const Engine &) = delete;
 
     MemoryReader *memoryReader;
-    D3::NavMesh *navMesh;
 };
 
 #endif // D3MH_ENGINE_H

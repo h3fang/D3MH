@@ -17,12 +17,15 @@ void Engine::update()
 {
     memoryReader->read(&localData, (void *)Addr_LocalData, sizeof(D3::LocalData));
     memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int));
-    navMesh->update();
+
+    if (localData.x04_IsNotInGame == 0) {
+        navMesh->update();
+    }
 }
 
 Engine::Engine():
-    memoryReader(MemoryReader::instance()),
-    navMesh(new D3::NavMesh)
+    navMesh(new D3::NavMesh),
+    memoryReader(MemoryReader::instance())
 {
 }
 

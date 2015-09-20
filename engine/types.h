@@ -25,8 +25,8 @@ struct Vec3
 
 struct AABB
 {
-    Vec3 Base;
-    Vec3 Offset;
+    Vec3 min;
+    Vec3 max;
 };
 
 struct Vec4
@@ -75,7 +75,7 @@ public:
     short   x112_NextIndex;
     int     x114_Free;
     int     x118_NeedsToExpand;
-    T**     x11C_PtrItems;
+    DWORD   x11C_PtrItems;
     int     x120_Allocation;
 };
 

@@ -35,6 +35,10 @@ public:
 class NavMesh
 {
 public:
+    AABB bounds;
+
+public:
+    NavMesh() {}
     static std::map<DWORD, DWORD> snoSceneIdAddrMap;
     std::vector<SceneData> sceneData;
     std::vector<SceneSnoData> sceneSnoData;

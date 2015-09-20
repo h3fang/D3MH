@@ -3,9 +3,7 @@
 
 #include <QWidget>
 
-namespace Ui {
-class Minimap;
-}
+#include <windows.h>
 
 class Engine;
 
@@ -17,14 +15,25 @@ public:
     explicit Minimap(QWidget *parent = 0);
     ~Minimap();
 
-    void paintEvent(QPaintEvent *event);
+protected:
+    void paintEvent(QPaintEvent *) override;
 
 private slots:
     void updateD3Data();
 
 private:
-    Ui::Minimap *ui;
+    void drawInfo(QPainter &p);
+    void drawMinimap(QPainter &p);
+
+    void repositionWindow();
+    QRect getD3ClientRect();
+
+private:
     Engine *engine;
+
+    HWND d3Window;
+
+    bool draw_minimap;
 };
 
 #endif // MINIMAP_H

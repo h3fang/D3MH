@@ -19,6 +19,10 @@ MemoryReader::MemoryReader(const wchar_t *name):
         process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
     }
 }
+DWORD MemoryReader::getProcessId() const
+{
+    return process_id;
+}
 
 MemoryReader::~MemoryReader()
 {
