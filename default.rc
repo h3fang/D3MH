@@ -1,4 +1,4 @@
 #include <windows.h>
 
-ID_ICON    ICON    DISCARDABLE    "icon.ico"
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "D3MH.exe.manifest"
+

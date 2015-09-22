@@ -6,70 +6,6 @@
 
 namespace D3 {
 
-enum SnoGroupId : DWORD
-{
-    SnoGroupId_Actor = 1,
-    SnoGroupId_Adventure = 2,
-    SnoGroupId_AmbientSound = 5,
-    SnoGroupId_Anim = 6,
-    SnoGroupId_Anim2D = 7,
-    SnoGroupId_AnimSet = 8,
-    SnoGroupId_Appearance = 9,
-    SnoGroupId_Hero = 10,
-    SnoGroupId_Cloth = 11,
-    SnoGroupId_Conversation = 12,
-    SnoGroupId_ConversationList = 13,
-    SnoGroupId_EffectGroup = 14,
-    SnoGroupId_Encounter = 15,
-    SnoGroupId_Explosion = 17,
-    SnoGroupId_FlagSet = 18,
-    SnoGroupId_Font = 19,
-    SnoGroupId_GameBalance = 20,
-    SnoGroupId_Globals = 21,
-    SnoGroupId_LevelArea = 22,
-    SnoGroupId_Light = 23,
-    SnoGroupId_MarkerSet = 24,
-    SnoGroupId_Monster = 25,
-    SnoGroupId_Observer = 26,
-    SnoGroupId_Particle = 27,
-    SnoGroupId_Physics = 28,
-    SnoGroupId_Power = 29,
-    SnoGroupId_Quest = 31,
-    SnoGroupId_Rope = 32,
-    SnoGroupId_Scene = 33,
-    SnoGroupId_SceneGroup = 34,
-    SnoGroupId_ShaderMap = 36,
-    SnoGroupId_Shaders = 37,
-    SnoGroupId_Shakes = 38,
-    SnoGroupId_SkillKit = 39,
-    SnoGroupId_Sound = 40,
-    SnoGroupId_SoundBank = 41,
-    SnoGroupId_StringList = 42,
-    SnoGroupId_Surface = 43,
-    SnoGroupId_Textures = 44,
-    SnoGroupId_Trail = 45,
-    SnoGroupId_UI = 46,
-    SnoGroupId_Weather = 47,
-    SnoGroupId_Worlds = 48,
-    SnoGroupId_Recipe = 49,
-    SnoGroupId_Condition = 51,
-    SnoGroupId_TreasureClass = 52,
-    SnoGroupId_Account = 53,
-    SnoGroupId_TimedEvent = 55,
-    SnoGroupId_Act = 56,
-    SnoGroupId_Material = 57,
-    SnoGroupId_QuestRange = 58,
-    SnoGroupId_Lore = 59,
-    SnoGroupId_Reverb = 60,
-    SnoGroupId_PhysMesh = 61,
-    SnoGroupId_Music = 62,
-    SnoGroupId_Tutorial = 63,
-    SnoGroupId_BossEncounter = 64,
-    SnoGroupId_Accolade = 66,
-    SnoGroupId_AnimTree = 67,
-    SnoGroupId_Vibrations = 68,
-};
-
 //sizeof = 0x10
 class MemHeader
 {
@@ -126,9 +62,9 @@ public:
 class NavCell
 {
 public:
-    Vec3 Min;					// 0x000
-    Vec3 Max;					// 0x00C
-    NavCellFlagsW Flag;			// 0x018
+    Vec3 min;					// 0x000
+    Vec3 max;					// 0x00C
+    NavCellFlagsW flag;			// 0x018
     WORD NeighbourCount;		// 0x01A
     DWORD NeighborsIndex;		// 0x01C
 };
@@ -196,7 +132,7 @@ public:
     DataPtr2 MapTrigEvent;		// 0x268
     DWORD pad_170[4];			// 0x270
     NavZoneDef NavZone;			// 0x180
-    DWORD SNOAppearance;		// 0x208
+    DWORD SNOAppearance;        // 0x208
     DWORD SNOPhysMesh;			// 0x20C
 };
 
@@ -204,9 +140,9 @@ public:
 class SnoDefinition
 {
 public:
-    int x00_Id;                 // 0x000
-    CHAR unk[3];                // 0x004
-    CHAR x07_SnoGroupId;        // 0x007
+    DWORD x00_Id;                 // 0x000
+    char unk[3];                // 0x004
+    char x07_SnoGroupId;        // 0x007
     DWORD x08_Size;             // 0x008
     DWORD pSNOAddr;             // 0x00C
 };

@@ -181,6 +181,27 @@ struct Scene {
     UCHAR unknown_0x2BC[0x6C4-0x2BD];
 };
 
+// SizeOf = 0x3C; // 60
+class SceneRevealInfo
+{
+public:
+    DWORD x00_SceneSnoId;
+    DWORD x04_SceneId_;
+    DWORD x08_WorldId_;
+    DWORD x0C_TextureSnoId;
+    float x10_MinX;
+    float x14_MinY;
+    float x18_MaxX;
+    float x1C_MaxY;
+    DWORD x20_TextureSnoId_;
+    char* x24_OpacityMask; // 8 bits-per-channel grayscale channel
+    int x28_OpacityMaskWidth;
+    int x2C_OpacityMaskHeight;
+    int x30_FrameCounter;
+    int x34_IsFullyVisible;
+    int _x38;
+};
+
 }
 #endif // D3MH_SCENE_H
 

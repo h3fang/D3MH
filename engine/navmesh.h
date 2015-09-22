@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include "structs.h"
 
@@ -12,44 +12,41 @@ namespace D3 {
 class SceneData
 {
 public:
-    int id;
-    int sno_id;
-    int area_sno_id;
+    DWORD id;
+    DWORD sno_id;
+    DWORD levelArea_sno_id;
     Vec3 min;
     Vec3 max;
+    std::vector<NavCell> cells;
+    bool finished;
 
 public:
     SceneData(const Scene &s);
-};
 
-class SceneSnoData
-{
-public:
-    int id;
-    std::vector<NavCell> cells;
-
-public:
-    SceneSnoData(int sno_id);
+    void loadFromMemory(const Scene &s);
 };
 
 class NavMesh
 {
 public:
-    AABB bounds;
+    static std::unordered_map<DWORD, DWORD> snoSceneIdAddrMap;
+    std::unordered_map<DWORD, SceneData*> sceneData;
 
 public:
-    NavMesh() {}
-    static std::map<DWORD, DWORD> snoSceneIdAddrMap;
-    std::vector<SceneData> sceneData;
-    std::vector<SceneSnoData> sceneSnoData;
+    NavMesh();
 
-public:
     void update();
-
+    void clear();
+    void clearScene();
+    void clearSnoScene();
     void parseMemorySnoScene();
 
     template<class T>
     static bool getSerializedRecords(std::vector<T> &out, DataPtr2 ptr, DWORD dwBase = 0);
+
+private:
+    bool cleared;
+    DWORD last_level_area_sno_id;
 };
 
 }

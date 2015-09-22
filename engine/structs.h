@@ -7,6 +7,7 @@
 #include "scene.h"
 #include "sno.h"
 #include "navmesh.h"
+#include "levelarea.h"
 
 #endif // D3MH_STRUCTS
 

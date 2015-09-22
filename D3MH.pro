@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -35,10 +35,9 @@ HEADERS  += minimap.h \
     process/helper.h \
     process/memoryreader.h \
     engine/navmesh.h \
-    process/pointer.h
-
-FORMS    +=
-
-LIBS += -lopengl32
+    process/pointer.h \
+    engine/levelarea.h \
+    engine/marker.h \
+    engine/ui.h
 
 RC_FILE = default.rc

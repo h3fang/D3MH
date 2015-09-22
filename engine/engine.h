@@ -41,7 +41,7 @@ class Engine
 {
 public:
     D3::LocalData localData;
-    int ApplicationLoopCount;
+    unsigned int ApplicationLoopCount;
     D3::NavMesh *navMesh;
 
 public:

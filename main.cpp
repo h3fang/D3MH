@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     qDebug("sizeof SnoScene %#x", sizeof(D3::SnoScene));
     qDebug("sizeof NavZoneDef %#x", sizeof(D3::NavZoneDef));
     qDebug("sizeof SnoDefinition %#x", sizeof(D3::SnoDefinition));
+    qDebug("sizeof LevelArea %#x", sizeof(D3::LevelArea));
 
     return a.exec();
 }
