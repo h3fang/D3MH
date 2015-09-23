@@ -1,6 +1,11 @@
 #include <windows.h>
 #include <gdiplus.h>
 
+//#include <d2d1.h>
+//#include <d2d1helper.h>
+//#include <dwrite.h>
+//#include <wincodec.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <vector>
@@ -11,19 +16,22 @@
 
 using namespace Gdiplus;
 
+// variables
 float CANVAS_WIDTH = 1500.0f;
 const float CANVAS_HEIGHT = 1200.0f;
 
-HWND hWnd;
+HWND hWnd = NULL;
 HWND d3Window = NULL;
 Rect windowPos = {0,0,800,800/5*4};
-int hotkey_id;
+int hotkey_id = 0;
 bool draw_minimap = true;
 
-Engine *engine;
+Engine *engine = NULL;
 
+//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+//
 bool registerHotKeys()
 {
     hotkey_id = GlobalAddAtomA("D3 MapHack");
@@ -37,7 +45,7 @@ bool getD3ClientRect(Rect &r)
     }
 
     if (!d3Window) {
-        printf("Failed to find D3 window");
+        fprintf(stderr, "Failed to find D3 window\n");
         return false;
     }
 
@@ -73,9 +81,8 @@ void repositionWindow() {
 
 void drawInfo(Graphics *p)
 {
-//    static Pen greenPen(Color(0, 255, 0));
-    static SolidBrush brush(Color(0, 255, 0));
-    static Font font(L"Arial", 2);
+    SolidBrush brush(Color(255, 0, 255, 0));
+    Font font(L"Consolas", 16);
 
     StringFormat stringformat;
     stringformat.SetAlignment(StringAlignmentCenter);
@@ -114,7 +121,6 @@ void drawMinimap(Graphics *p){
 
     auto state = p->Save();
 
-    p->ScaleTransform((windowPos.Width)/CANVAS_WIDTH, (windowPos.Height)/CANVAS_HEIGHT);
     p->TranslateTransform(CANVAS_WIDTH/2,CANVAS_HEIGHT/2);
     p->RotateTransform(-45.0);
     p->ScaleTransform(-1.0, 1.0);
@@ -122,7 +128,6 @@ void drawMinimap(Graphics *p){
     drawCoordinates(p);
 
     p->TranslateTransform(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY);
-
 
     std::vector<RectF> scene_grids, scene_cells;
     scene_grids.reserve(engine->navMesh->sceneData.size());
@@ -159,6 +164,8 @@ void OnPaint(HDC hdc)
     }
 
     Graphics g(hdc);
+    g.ScaleTransform((windowPos.Width)/CANVAS_WIDTH, (windowPos.Height)/CANVAS_HEIGHT);
+    g.SetTextRenderingHint(TextRenderingHintSingleBitPerPixel);
     drawInfo(&g);
     drawMinimap(&g);
 }
@@ -185,6 +192,15 @@ void init() {
     setbuf(stderr, NULL);
     engine = Engine::getInstance();
     registerHotKeys();
+
+    // initialize the window to screen center
+    int w, h;
+    w = GetSystemMetrics(SM_CXSCREEN);
+    h = GetSystemMetrics(SM_CYSCREEN);
+    windowPos.Width = w;
+    windowPos.Height = h;
+    windowPos.X = (w-windowPos.Width)/2;
+    windowPos.Y = (h-windowPos.Height)/2;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow)
@@ -205,7 +221,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
     wcex.lpfnWndProc    = WndProc;
     wcex.hInstance		= hInstance;
     wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground	= (HBRUSH)GetStockObject(NULL_BRUSH);
+    wcex.hbrBackground	= (HBRUSH)CreateSolidBrush(0xFFFFFF);
     wcex.lpszMenuName	= NULL;
     wcex.lpszClassName	= L"minwindowsapp";
 
@@ -214,7 +230,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 
     hWnd = CreateWindowEx(WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TRANSPARENT,
                           wcex.lpszClassName, L"D3MH",
-                          WS_POPUPWINDOW,
+                          WS_POPUP,
                           windowPos.X, windowPos.Y,
                           windowPos.Width, windowPos.Height,
                           NULL, NULL, hInstance, NULL);
@@ -223,7 +239,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
     }
 
     SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-    SetLayeredWindowAttributes(hWnd, RGB(255,255,255), (255 * 0) / 100, LWA_COLORKEY);
+    SetLayeredWindowAttributes(hWnd, RGB(255,255,255), 0, LWA_COLORKEY);
 
     SetWindowPos(hWnd, HWND_TOPMOST,
                  windowPos.X, windowPos.Y,
@@ -267,7 +283,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         draw_minimap = !draw_minimap;
         break;
     case WM_DESTROY:
-    case WM_CLOSE:
         PostQuitMessage(0);
         break;
     default:
