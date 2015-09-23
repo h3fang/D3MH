@@ -1,29 +1,22 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2015-09-06T12:02:02
-#
-#-------------------------------------------------
-
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = D3MH
 TEMPLATE = app
 
 DESTDIR = ../bin
 
-CONFIG += c++11
+CONFIG += windows c++11
+CONFIG -= app_bundle
+CONFIG -= qt
+
+LIBS += -lGdiplus -lgdi32
 
 SOURCES += main.cpp\
-        minimap.cpp \
     engine/engine.cpp \
     process/memoryreader.cpp \
     process/helper.cpp \
     engine/navmesh.cpp
 
-HEADERS  += minimap.h \
-    engine/engine.h \
+HEADERS  += \
+	engine/engine.h \
     engine/objectmanager.h \
     engine/structs.h \
     engine/types.h \
