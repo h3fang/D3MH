@@ -34,8 +34,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 //
 bool registerHotKeys()
 {
-    hotkey_id = GlobalAddAtomA("D3 MapHack");
-    return RegisterHotKey(hWnd, hotkey_id, 0, VK_OEM_3) == TRUE;
+    hotkey_id = GlobalAddAtom(L"D3 MapHack");
+    if (!RegisterHotKey(hWnd, hotkey_id, 0, VK_OEM_3)) {
+        fprintf(stderr, "Failed to register hotkey\n");
+        return false;
+    }
+
+    return true;
 }
 
 bool getD3ClientRect(Rect &r)
@@ -68,12 +73,10 @@ bool getD3ClientRect(Rect &r)
 void repositionWindow() {
     Rect r;
     if (getD3ClientRect(r)){
-        if(r.X != windowPos.X ||
-                r.Y != windowPos.Y ||
-                r.Width != windowPos.Width ||
-                r.Height != windowPos.Height) {
+        if(r.X != windowPos.X || r.Y != windowPos.Y ||
+                r.Width != windowPos.Width || r.Height != windowPos.Height) {
             SetWindowPos(hWnd, HWND_TOPMOST, r.X, r.Y, r.Width, r.Height, 0);
-
+            windowPos = r;
             CANVAS_WIDTH = float(r.Width)/(r.Height)*CANVAS_HEIGHT;
         }
     }
@@ -81,6 +84,10 @@ void repositionWindow() {
 
 void drawInfo(Graphics *p)
 {
+    if (!d3Window || d3Window != GetForegroundWindow()) {
+        return;
+    }
+
     SolidBrush brush(Color(255, 0, 255, 0));
     Font font(L"Consolas", 16);
 
@@ -115,7 +122,8 @@ void drawCoordinates(Graphics *p)
 }
 
 void drawMinimap(Graphics *p){
-    if (!draw_minimap) {
+
+    if (!draw_minimap || !d3Window || d3Window != GetForegroundWindow()) {
         return;
     }
 
@@ -125,7 +133,7 @@ void drawMinimap(Graphics *p){
     p->RotateTransform(-45.0);
     p->ScaleTransform(-1.0, 1.0);
 
-    drawCoordinates(p);
+//    drawCoordinates(p);
 
     p->TranslateTransform(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY);
 
@@ -144,13 +152,13 @@ void drawMinimap(Graphics *p){
         }
     }
 
-    Pen greenPen(Color(0, 255, 0));
-    SolidBrush greenBrush(Color(64, 0, 255, 0));
-    p->DrawRectangles(&greenPen, scene_grids.data(), scene_grids.size());
-    p->FillRectangles(&greenBrush, scene_grids.data(), scene_grids.size());
+//    Pen greenPen(Color(0, 255, 0));
+//    SolidBrush greenBrush(Color(8, 0, 64, 0));
+//    p->DrawRectangles(&greenPen, scene_grids.data(), scene_grids.size());
+//    p->FillRectangles(&greenBrush, scene_grids.data(), scene_grids.size());
 
     Pen bluePen(Color(0, 0, 255));
-    SolidBrush blueBrush(Color(64, 0, 0, 255));
+    SolidBrush blueBrush(Color(128, 0, 0, 255));
     p->DrawRectangles(&bluePen, scene_cells.data(), scene_cells.size());
     p->FillRectangles(&blueBrush, scene_cells.data(), scene_cells.size());
 
@@ -159,25 +167,29 @@ void drawMinimap(Graphics *p){
 
 void OnPaint(HDC hdc)
 {
-    if (!d3Window || d3Window != GetForegroundWindow()) {
-        return;
-    }
+    Bitmap bmp(windowPos.Width, windowPos.Height);
+    Graphics cg(&bmp);
+
+    cg.Clear(Color(255,255,255));
+    cg.ScaleTransform((windowPos.Width)/CANVAS_WIDTH, (windowPos.Height)/CANVAS_HEIGHT);
+    cg.SetTextRenderingHint(TextRenderingHintSingleBitPerPixel);
+
+//    drawInfo(&cg);
+    drawMinimap(&cg);
 
     Graphics g(hdc);
-    g.ScaleTransform((windowPos.Width)/CANVAS_WIDTH, (windowPos.Height)/CANVAS_HEIGHT);
-    g.SetTextRenderingHint(TextRenderingHintSingleBitPerPixel);
-    drawInfo(&g);
-    drawMinimap(&g);
+    CachedBitmap cachedBmp(&bmp, &g);
+    g.DrawCachedBitmap(&cachedBmp,0,0);
 }
 
 void CALLBACK OnTimer(HWND /*hwnd*/, UINT /*message*/, UINT /*idTimer*/, DWORD /*dwTime*/)
 {
     repositionWindow();
 
-    if (!d3Window || d3Window != GetForegroundWindow()) {
-        return;
+    if (d3Window && d3Window == GetForegroundWindow()) {
+        engine->update();
     }
-    engine->update();
+
     InvalidateRect(hWnd,NULL,TRUE);
 }
 
@@ -191,6 +203,7 @@ void OnQuit() {
 void init() {
     setbuf(stderr, NULL);
     engine = Engine::getInstance();
+
     registerHotKeys();
 
     // initialize the window to screen center
@@ -217,7 +230,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
     wcex.cbSize         = sizeof(WNDCLASSEX);
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.style          = 0;//CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc    = WndProc;
     wcex.hInstance		= hInstance;
     wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
@@ -239,7 +252,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
     }
 
     SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-    SetLayeredWindowAttributes(hWnd, RGB(255,255,255), 0, LWA_COLORKEY);
+    SetLayeredWindowAttributes(hWnd, RGB(255,255,255), 255, LWA_COLORKEY|LWA_ALPHA);
 
     SetWindowPos(hWnd, HWND_TOPMOST,
                  windowPos.X, windowPos.Y,
@@ -256,8 +269,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        if (msg.message == WM_HOTKEY) {
+            draw_minimap = !draw_minimap;
+        }
+        else {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
     }
 
     KillTimer(hWnd, timerId);
@@ -274,13 +292,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch(message)
     {
+    case WM_ERASEBKGND:
+        break;
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
         OnPaint(hdc);
         EndPaint(hWnd, &ps);
-        break;
-    case WM_HOTKEY:
-        draw_minimap = !draw_minimap;
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
