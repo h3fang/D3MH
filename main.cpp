@@ -158,28 +158,62 @@ void drawMinimap(Graphics *p){
 //    p->FillRectangles(&greenBrush, scene_grids.data(), scene_grids.size());
 
     Pen bluePen(Color(0, 0, 255));
-    SolidBrush blueBrush(Color(128, 0, 0, 255));
+    SolidBrush blueBrush(Color(64, 0, 0, 255));
     p->DrawRectangles(&bluePen, scene_cells.data(), scene_cells.size());
     p->FillRectangles(&blueBrush, scene_cells.data(), scene_cells.size());
 
     p->Restore(state);
 }
 
-void OnPaint(HDC hdc)
+void OnPaint(HDC &hdc)
 {
-    Bitmap bmp(windowPos.Width, windowPos.Height);
-    Graphics cg(&bmp);
+    HDC hdcMem = CreateCompatibleDC(hdc);
+    HBITMAP bmMem = CreateCompatibleBitmap(hdc, windowPos.Width, windowPos.Height);
+    HBITMAP hbmpOld = (HBITMAP)SelectObject(hdcMem, bmMem);
 
-    cg.Clear(Color(255,255,255));
-    cg.ScaleTransform((windowPos.Width)/CANVAS_WIDTH, (windowPos.Height)/CANVAS_HEIGHT);
-    cg.SetTextRenderingHint(TextRenderingHintSingleBitPerPixel);
+    Graphics g(hdcMem);
+
+    g.Clear(Color::Transparent);
+    g.ScaleTransform((windowPos.Width)/CANVAS_WIDTH, (windowPos.Height)/CANVAS_HEIGHT);
+    g.SetTextRenderingHint(TextRenderingHintSingleBitPerPixel);
 
 //    drawInfo(&cg);
-    drawMinimap(&cg);
+    drawMinimap(&g);
 
-    Graphics g(hdc);
-    CachedBitmap cachedBmp(&bmp, &g);
-    g.DrawCachedBitmap(&cachedBmp,0,0);
+    POINT windowPosition = {windowPos.X, windowPos.Y};
+    POINT sourcePosition = {0, 0};
+    SIZE size = { windowPos.Width, windowPos.Height };
+
+    BLENDFUNCTION blend;
+    blend.BlendFlags = 0;
+    blend.BlendOp = AC_SRC_OVER;
+    blend.SourceConstantAlpha = 255;
+    blend.AlphaFormat = AC_SRC_ALPHA;
+
+    if (!UpdateLayeredWindow(hWnd, NULL, &windowPosition, &size, hdcMem,
+                             &sourcePosition, RGB(0, 0, 0), &blend, ULW_ALPHA)) {
+
+        LPVOID lpMsgBuf;
+        FormatMessage(
+                    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                    FORMAT_MESSAGE_FROM_SYSTEM |
+                    FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL,
+                    GetLastError(),
+                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                    (LPTSTR) &lpMsgBuf,
+                    0,
+                    NULL
+                    );
+
+        fwprintf(stderr, L"Failed to call UpdateLayeredWindow(): %s\n",  lpMsgBuf);
+
+        LocalFree( lpMsgBuf );
+    }
+
+    SelectObject(hdcMem, hbmpOld);
+    DeleteObject(bmMem);
+    DeleteDC(hdcMem);
 }
 
 void CALLBACK OnTimer(HWND /*hwnd*/, UINT /*message*/, UINT /*idTimer*/, DWORD /*dwTime*/)
@@ -190,7 +224,9 @@ void CALLBACK OnTimer(HWND /*hwnd*/, UINT /*message*/, UINT /*idTimer*/, DWORD /
         engine->update();
     }
 
-    InvalidateRect(hWnd,NULL,TRUE);
+    HDC hdc = GetDC(hWnd);
+    OnPaint(hdc);
+    ReleaseDC(hWnd,hdc);
 }
 
 void OnQuit() {
@@ -206,14 +242,12 @@ void init() {
 
     registerHotKeys();
 
-    // initialize the window to screen center
-    int w, h;
-    w = GetSystemMetrics(SM_CXSCREEN);
-    h = GetSystemMetrics(SM_CYSCREEN);
-    windowPos.Width = w;
-    windowPos.Height = h;
-    windowPos.X = (w-windowPos.Width)/2;
-    windowPos.Y = (h-windowPos.Height)/2;
+    // initialize the window to screen size
+    windowPos.X = 0;
+    windowPos.Y = 0;
+    windowPos.Width = GetSystemMetrics(SM_CXSCREEN);
+    windowPos.Height = GetSystemMetrics(SM_CYSCREEN);
+    CANVAS_WIDTH = float(windowPos.Width)/(windowPos.Height)*CANVAS_HEIGHT;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow)
@@ -251,19 +285,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
         return 2;
     }
 
-    SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-    SetLayeredWindowAttributes(hWnd, RGB(255,255,255), 255, LWA_COLORKEY|LWA_ALPHA);
-
-    SetWindowPos(hWnd, HWND_TOPMOST,
-                 windowPos.X, windowPos.Y,
-                 windowPos.Width,
-                 windowPos.Height, 0);
-
     ShowWindow(hWnd, nCmdShow);
-    UpdateWindow(hWnd);
 
+    // set up update timer
     unsigned int timerId = 1;
-
     SetTimer(hWnd, timerId, 100, OnTimer);
 
     MSG msg;
@@ -287,17 +312,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
-    HDC hdc;
-
     switch(message)
     {
     case WM_ERASEBKGND:
         break;
     case WM_PAINT:
-        hdc = BeginPaint(hWnd, &ps);
-        OnPaint(hdc);
-        EndPaint(hWnd, &ps);
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
