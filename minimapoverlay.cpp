@@ -4,19 +4,41 @@
 #include <string.h>
 #include <vector>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+//#include <GL/gl.h>
+//#include <GL/glu.h>
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 #include "engine/engine.h"
 #include "process/pointer.h"
 #include "process/helper.h"
+
+// Vertex shader
+const char* vertexShaderSrc = GLSL(
+    in vec2 pos;
+
+    void main() {
+        gl_Position = vec4(pos, 0.0, 1.0);
+    }
+);
+
+// Fragment shader
+const char* fragmentShaderSrc = GLSL(
+    out vec4 outColor;
+
+    void main() {
+        outColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+);
 
 MinimapOverlay::MinimapOverlay() :
     LayeredWindow(),
     d3Window(NULL),
     minimapHotkeyId(0),
     draw_minimap(true),
-    engine(NULL)
+    engine(NULL),
+    shaderProgram(NULL)
 {
 }
 
@@ -45,7 +67,7 @@ void MinimapOverlay::onInit()
                     NULL
                     );
 
-        fwprintf(stderr, L"Failed to register hotkey: %s\n",  lpMsgBuf);
+        fwprintf(stderr, L"Failed to register hotkey: %ls\n",  lpMsgBuf);
 
         LocalFree( lpMsgBuf );
         return;
@@ -71,10 +93,10 @@ void MinimapOverlay::onQuit()
 
 void MinimapOverlay::onRender()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glTranslatef((windowPos.right-windowPos.left)/CANVAS_WIDTH, (windowPos.bottom-windowPos.top)/CANVAS_HEIGHT, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    drawInfo();
+//    drawInfo();
     drawMinimap();
 }
 
@@ -88,11 +110,22 @@ void MinimapOverlay::onTimer(UINT timerId)
             engine->update();
         }
 
-        onRender();
+        render();
         break;
     default:
         break;
     }
+}
+
+void MinimapOverlay::resizeGL(UINT width, UINT height)
+{
+    glViewport(0, 0, width, height);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    projectionMatrix = glm::ortho(-0.5*width, 0.5*width, -0.5*height, 0.5*height);
+
+    modelViewMatrix = glm::scale(glm::vec3(-1.0, 1.0, 1.0)) * glm::rotate(-45.0f, glm::vec3(0.0, 0.0, 1.0));
 }
 
 bool MinimapOverlay::getD3ClientRect(RECT &rect)
@@ -134,83 +167,79 @@ void MinimapOverlay::drawInfo()
         return;
     }
 
-//    SolidBrush brush(Color(255, 0, 255, 0));
-//    Font font(L"Consolas", 16);
+    //    SolidBrush brush(Color(255, 0, 255, 0));
+    //    Font font(L"Consolas", 16);
 
     char str[256];
     sprintf(str, "FrameCnt:%u\nAppLoopCnt:%u\nWorldSnoId:%d\nX:%.4f\nY:%.4f\nZ:%.4f\nSceneCnt:%u",
-             Pointer<D3::DWORD>()(Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame)),
-             engine->ApplicationLoopCount,
-             engine->localData.x0C_WorldSnoId,
-             engine->localData.x24_WorldPosX,
-             engine->localData.x28_WorldPosY,
-             engine->localData.x2C_WorldPosZ,
-             engine->navMesh->sceneData.size());
+            Pointer<D3::DWORD>()(Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame)),
+            engine->ApplicationLoopCount,
+            engine->localData.x0C_WorldSnoId,
+            engine->localData.x24_WorldPosX,
+            engine->localData.x28_WorldPosY,
+            engine->localData.x2C_WorldPosZ,
+            engine->navMesh->sceneData.size());
 
-//    p->DrawString(str, wcslen(str), &font,
-//                  RectF(0, 0, 0.2*CANVAS_WIDTH, 0.4*CANVAS_HEIGHT),
-//                  &stringformat, &brush);
+    //    p->DrawString(str, wcslen(str), &font,
+    //                  RectF(0, 0, 0.2*CANVAS_WIDTH, 0.4*CANVAS_HEIGHT),
+    //                  &stringformat, &brush);
 }
 
 void MinimapOverlay::drawCoordinates()
 {
-    glColor3f(255, 0, 0);
-    glLineWidth(3);
+    static const GLfloat g_vertices[] = {
+        0.0f,   0.0f,   0.0f,
+        200.0f, 0.0f,   0.0f,
+        0.0f,   0.0f,   0.0f,
+        0.0f,   200.0f, 0.0f,
+    };
 
-    glBegin(GL_LINE);
-        glVertex2f(0, 0);
-        glVertex2f(200, 0);
-    glEnd();
+    static const GLfloat g_colors[] = {
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+    };
 
-    glColor3f(0, 0, 255);
-    glLineWidth(3);
 
-    glBegin(GL_LINE);
-        glVertex2f(0, 0);
-        glVertex2f(0, 200);
-    glEnd();
 }
 
 void MinimapOverlay::drawMinimap()
 {
-    if (!draw_minimap || !d3Window || d3Window != GetForegroundWindow()) {
-        return;
-    }
+    //    if (!draw_minimap || !d3Window || d3Window != GetForegroundWindow()) {
+    //        return;
+    //    }
 
-    glPushMatrix();
-
-    glTranslatef(CANVAS_WIDTH/2,CANVAS_HEIGHT/2, 0.0f);
-    glRotatef(-45.0f, 0.0f, 0.0f, 0.0f);
-    glScalef(-1.0f, 1.0f, 0.0f);
+//    glPushMatrix();
 
     drawCoordinates();
 
-    glTranslatef(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY, 0.0f);
+//    glTranslatef(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY, 0.0f);
 
-//    std::vector<RectF> scene_grids, scene_cells;
-//    scene_grids.reserve(engine->navMesh->sceneData.size());
-//    scene_cells.reserve(100*engine->navMesh->sceneData.size());
+    //    std::vector<RectF> scene_grids, scene_cells;
+    //    scene_grids.reserve(engine->navMesh->sceneData.size());
+    //    scene_cells.reserve(100*engine->navMesh->sceneData.size());
 
 
-//    for (auto &pair : engine->navMesh->sceneData) {
-//        D3::SceneData *s = pair.second;
+    //    for (auto &pair : engine->navMesh->sceneData) {
+    //        D3::SceneData *s = pair.second;
 
-//        scene_grids.push_back(RectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
+    //        scene_grids.push_back(RectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
 
-//        for (D3::NavCell &c: s->cells) {
-//            scene_cells.push_back(RectF(c.min.x+s->min.x, c.min.y+s->min.y, c.max.x-c.min.x, c.max.y-c.min.y));
-//        }
-//    }
+    //        for (D3::NavCell &c: s->cells) {
+    //            scene_cells.push_back(RectF(c.min.x+s->min.x, c.min.y+s->min.y, c.max.x-c.min.x, c.max.y-c.min.y));
+    //        }
+    //    }
 
-////    Pen greenPen(Color(0, 255, 0));
-////    SolidBrush greenBrush(Color(8, 0, 64, 0));
-////    p->DrawRectangles(&greenPen, scene_grids.data(), scene_grids.size());
-////    p->FillRectangles(&greenBrush, scene_grids.data(), scene_grids.size());
+    ////    Pen greenPen(Color(0, 255, 0));
+    ////    SolidBrush greenBrush(Color(8, 0, 64, 0));
+    ////    p->DrawRectangles(&greenPen, scene_grids.data(), scene_grids.size());
+    ////    p->FillRectangles(&greenBrush, scene_grids.data(), scene_grids.size());
 
-//    glColor3f(0, 0, 255);
-//    SolidBrush blueBrush(Color(64, 0, 0, 255));
-//    p->DrawRectangles(&bluePen, scene_cells.data(), scene_cells.size());
-//    p->FillRectangles(&blueBrush, scene_cells.data(), scene_cells.size());
+    //    glColor3f(0, 0, 255);
+    //    SolidBrush blueBrush(Color(64, 0, 0, 255));
+    //    p->DrawRectangles(&bluePen, scene_cells.data(), scene_cells.size());
+    //    p->FillRectangles(&blueBrush, scene_cells.data(), scene_cells.size());
 
-    glPopMatrix();
+//    glPopMatrix();
 }

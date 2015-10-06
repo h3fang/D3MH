@@ -3,6 +3,8 @@
 
 #include "layered/layeredwindow.h"
 
+#include <GLSL/shader.h>
+
 class Engine;
 
 class MinimapOverlay : public LayeredWindow
@@ -16,6 +18,7 @@ protected:
     void onQuit() override;
     void onRender() override;
     void onTimer(UINT timerId) override;
+    void resizeGL(UINT width, UINT height) override;
 
 private:
     bool getD3ClientRect(RECT &rect);
@@ -34,6 +37,8 @@ private:
     bool draw_minimap;
 
     Engine *engine;
+
+    Shader *shaderProgram;
 };
 
 #endif // D3MH_MINIMAPOVERLAY_H

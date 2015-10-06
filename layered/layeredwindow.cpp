@@ -4,26 +4,11 @@
 #include <wchar.h>
 #include <string.h>
 
-void *GetAnyGLFuncAddress(const char *name)
-{
-    void *p = (void *)wglGetProcAddress(name);
-    if(p == 0 ||
-            (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
-            (p == (void*)-1) )
-    {
-        HMODULE module = LoadLibraryA("opengl32.dll");
-        p = (void *)GetProcAddress(module, name);
-    }
-
-    return p;
-}
+#include <glm/ext.hpp>
 
 LayeredWindow::LayeredWindow() :
     hWnd(NULL),
     hDC(NULL),
-    g_hPBufferDC(0),
-    g_hPBufferRC(0),
-    g_hPBuffer(0),
     m_info(nullptr),
     m_bitmap(nullptr),
     initialized(false)
@@ -44,8 +29,6 @@ LayeredWindow::~LayeredWindow()
     if (hDC) {
         ReleaseDC(hWnd, hDC);
     }
-
-    releasePBuffer();
 }
 
 HRESULT LayeredWindow::initialize()
@@ -93,7 +76,7 @@ HRESULT LayeredWindow::initWindow()
     WNDCLASSEX wcex;
     ZeroMemory(&wcex, sizeof(WNDCLASSEX));
     wcex.cbSize         = sizeof(WNDCLASSEX);
-    wcex.style         = 0;
+    wcex.style         = CS_OWNDC;
     wcex.lpfnWndProc   = LayeredWindow::WndProc;
     wcex.cbClsExtra    = 0;
     wcex.cbWndExtra    = sizeof(LONG_PTR);
@@ -139,7 +122,6 @@ HRESULT LayeredWindow::initGL()
     else {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glClearColor(0, 0, 0, 0);
     }
 
     return hr;
@@ -151,27 +133,34 @@ void LayeredWindow::resizeGL(UINT width, UINT height)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0.0, width, 0.0, height);
+    projectionMatrix = glm::ortho(0u, width, 0u, height);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    modelViewMatrix = glm::mat4(1.0);
 }
 
 bool LayeredWindow::createOpenGLContext()
 {
     // create a temporary context to load extensions
 
-    PIXELFORMATDESCRIPTOR pfd;
-    memset(&pfd,0, sizeof(PIXELFORMATDESCRIPTOR));
-    pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 32;
-    pfd.cDepthBits = 0;
-    pfd.iLayerType = PFD_MAIN_PLANE;
+    PIXELFORMATDESCRIPTOR pfd =
+    {
+        sizeof(PIXELFORMATDESCRIPTOR),
+        1,
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL,    //Flags
+        PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
+        32,                        //Colordepth of the framebuffer.
+        0, 0, 0, 0, 0, 0,
+        0,
+        0,
+        0,
+        0, 0, 0, 0,
+        24,                        //Number of bits for the depthbuffer
+        8,                        //Number of bits for the stencilbuffer
+        0,                        //Number of Aux buffers in the framebuffer.
+        PFD_MAIN_PLANE,
+        0,
+        0, 0, 0
+    };
 
     int pf = ChoosePixelFormat(hDC, &pfd);
 
@@ -189,18 +178,14 @@ bool LayeredWindow::createOpenGLContext()
         return false;
     }
 
-    if (!initOpenGLExtensions()) {
-        return false;
+    GLenum err=glewInit();
+    if(err!=GLEW_OK)
+    {
+        //Problem: glewInit failed, something is seriously wrong.
+        fprintf(stderr, "glewInit failed, aborting.\n");
     }
 
-    if (!initPBuffer()) {
-        return false;
-    }
-
-    wglMakeCurrent(hDC, 0);
-    wglMakeCurrent(g_hPBufferDC, g_hPBufferRC);
-
-    fprintf(stderr, "OpenGL version: %s\n", glGetString(GL_VERSION));
+    fprintf(stderr, "OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     return true;
 }
@@ -215,18 +200,12 @@ void LayeredWindow::render() {
     // Notice that we also need to invert the pbuffer's pixel data since OpenGL
     // by default orients the bitmap image bottom up. Our Windows DIB wrapper
     // expects images to be top down in orientation.
+
     // (this is done by invert the y axis)
 
     // pre-multiplied alpha values in the RGB channels
-    UCHAR *pPixel = m_bitmap->bits;
-    int totalPixels = m_bitmap->width * m_bitmap->height;
 
-    for (int i = 0; i < totalPixels; ++i, pPixel += 4)
-    {
-        pPixel[0] = (UCHAR)(pPixel[0] * (float)pPixel[3] / 255.0f);
-        pPixel[1] = (UCHAR)(pPixel[1] * (float)pPixel[3] / 255.0f);
-        pPixel[2] = (UCHAR)(pPixel[2] * (float)pPixel[3] / 255.0f);
-    }
+    // (too slow, use shader to do it)
 
     m_info->update(hWnd, m_bitmap->getDC());
 }
@@ -256,7 +235,6 @@ LRESULT LayeredWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 
         if (pApp && pApp->isInitialized())
         {
-            WINDOWPOS *pos = NULL;
             switch (message)
             {
             case WM_ERASEBKGND:
@@ -265,9 +243,11 @@ LRESULT LayeredWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
             case WM_TIMER:
                 pApp->onTimer(wParam);
                 break;
-            case WM_WINDOWPOSCHANGING:
-                pos = (WINDOWPOS*)lParam;
-                pApp->onResize(pos->x, pos->y, pos->cx, pos->cy);
+            case WM_MOVE:
+                pApp->onMove(LOWORD(lParam), HIWORD(lParam));
+                break;
+            case WM_SIZE:
+                pApp->onResize(LOWORD(lParam), HIWORD(lParam));
                 break;
             case WM_DESTROY:
                 pApp->onQuit();
@@ -305,114 +285,34 @@ void LayeredWindow::onQuit()
 
 }
 
-void LayeredWindow::onResize(UINT x, UINT y, UINT width, UINT height)
+void LayeredWindow::onResize(int width, int height)
 {
-    m_info->updateSize(x, y, width, height);
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+
+    if (m_info) {
+        m_info->resize(width, height);
+    }
+
     if (m_bitmap) {
         delete m_bitmap;
         m_bitmap = new LayeredBitmap(width, height);
-        releasePBuffer();
-        updatePBuffer(width, height);
     }
 
     resizeGL(width, height);
 }
 
+void LayeredWindow::onMove(int x, int y)
+{
+    if (m_info) {
+        m_info->moveTo(x, y);
+    }
+}
+
 void LayeredWindow::onTimer(UINT /*timerId*/)
 {
 
-}
-
-bool LayeredWindow::initOpenGLExtensions()
-{
-    // WGL_ARB_pbuffer.
-    wglDestroyPbufferARB   = (PFNWGLDESTROYPBUFFERARBPROC)wglGetProcAddress("wglDestroyPbufferARB");
-    wglQueryPbufferARB     = (PFNWGLQUERYPBUFFERARBPROC)wglGetProcAddress("wglQueryPbufferARB");
-    wglGetPbufferDCARB     = (PFNWGLGETPBUFFERDCARBPROC)wglGetProcAddress("wglGetPbufferDCARB");
-    wglCreatePbufferARB    = (PFNWGLCREATEPBUFFERARBPROC)wglGetProcAddress("wglCreatePbufferARB");
-    wglReleasePbufferDCARB = (PFNWGLRELEASEPBUFFERDCARBPROC)wglGetProcAddress("wglReleasePbufferDCARB");
-
-    // WGL_ARB_pixel_format.
-    wglChoosePixelFormatARB      = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-    wglGetPixelFormatAttribfvARB = (PFNWGLGETPIXELFORMATATTRIBFVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribfvARB");
-    wglGetPixelFormatAttribivARB = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
-
-    if (!wglDestroyPbufferARB || !wglQueryPbufferARB || !wglGetPbufferDCARB || !wglCreatePbufferARB || !wglReleasePbufferDCARB)
-    {
-        fprintf(stderr, "Required extension WGL_ARB_pbuffer not supported\n");
-        return false;
-    }
-
-    if (!wglChoosePixelFormatARB || !wglGetPixelFormatAttribfvARB || !wglGetPixelFormatAttribivARB)
-    {
-        fprintf(stderr, "Required extension WGL_ARB_pixel_format not supported\n");
-        return false;
-    }
-
-    return true;
-}
-
-bool LayeredWindow::initPBuffer()
-{
-    int attribList[] =
-    {
-        WGL_DRAW_TO_PBUFFER_ARB, TRUE,      // allow rendering to the pbuffer
-        WGL_SUPPORT_OPENGL_ARB,  TRUE,      // associate with OpenGL
-        WGL_DOUBLE_BUFFER_ARB,   FALSE,     // single buffered
-        WGL_RED_BITS_ARB,   8,              // minimum 8-bits for red channel
-        WGL_GREEN_BITS_ARB, 8,              // minimum 8-bits for green channel
-        WGL_BLUE_BITS_ARB, 8,              // minimum 8-bits for blue channel
-        WGL_ALPHA_BITS_ARB, 8,              // minimum 8-bits for alpha channel
-        WGL_DEPTH_BITS_ARB, 16,             // minimum 16-bits for depth buffer
-        0
-    };
-
-    pixelformat = 0;
-    UINT matchingFormats = 0;
-
-    if (!wglChoosePixelFormatARB(hDC, attribList, 0, 1, &pixelformat, &matchingFormats))
-    {
-        fprintf(stderr, "wglChoosePixelFormatARB() failed\n");
-        return false;
-    }
-
-    return updatePBuffer(windowPos.right-windowPos.left, windowPos.bottom-windowPos.top);
-}
-
-bool LayeredWindow::updatePBuffer(UINT width, UINT height)
-{
-    if (!(g_hPBuffer = wglCreatePbufferARB(hDC, pixelformat, width, height, 0)))
-    {
-        fprintf(stderr, "wglCreatePbufferARB() failed\n");
-        return false;
-    }
-
-    if (!(g_hPBufferDC = wglGetPbufferDCARB(g_hPBuffer)))
-    {
-        fprintf(stderr, "wglGetPbufferDCARB() failed\n");
-        return false;
-    }
-
-    if (!(g_hPBufferRC = wglCreateContext(g_hPBufferDC)))
-    {
-        fprintf(stderr, "wglCreateContext() failed for PBuffer\n");
-        return false;
-    }
-
-    return true;
-}
-
-void LayeredWindow::releasePBuffer()
-{
-    if (g_hPBuffer)
-    {
-        wglDeleteContext(g_hPBufferRC);
-        wglReleasePbufferDCARB(g_hPBuffer, g_hPBufferDC);
-        wglDestroyPbufferARB(g_hPBuffer);
-        g_hPBufferRC = 0;
-        g_hPBufferDC = 0;
-        g_hPBuffer = 0;
-    }
 }
 
 bool LayeredWindow::isInitialized() const

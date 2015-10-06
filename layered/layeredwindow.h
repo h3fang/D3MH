@@ -3,10 +3,10 @@
 
 #include <windows.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
-#include <GL/wglext.h>
+#define GLEW_STATIC
+#include <GL/glew.h>
+
+#include <glm/glm.hpp>
 
 #include "layeredwindowinfo.h"
 #include "layeredbitmap.h"
@@ -42,6 +42,7 @@ protected:
     HRESULT initWindow();
     HRESULT initGL();
     bool createOpenGLContext();
+    void render();
 
 protected:
     virtual void resizeGL(UINT width, UINT height);
@@ -49,39 +50,30 @@ protected:
     virtual void onRender();
     virtual void onHotkey(DWORD lParam);
     virtual void onQuit();
-    virtual void onResize(UINT x, UINT y, UINT width, UINT height);
+    virtual void onResize(int width, int height);
+    virtual void onMove(int x, int y);
     virtual void onTimer(UINT timerId);
 
 private:
     bool initOpenGLExtensions();
     bool initPBuffer();
-    bool updatePBuffer(UINT width, UINT height);
+    bool resizePBuffer(UINT width, UINT height);
     void releasePBuffer();
-
-    void render();
 
 protected:
     HWND hWnd;
     HDC hDC;
-    HDC g_hPBufferDC;
-    HGLRC g_hPBufferRC;
-    HPBUFFERARB g_hPBuffer;
     RECT windowPos;
     LayeredWindowInfo *m_info;
     LayeredBitmap *m_bitmap;
     bool initialized;
     int pixelformat;
 
-private:
-    PFNWGLDESTROYPBUFFERARBPROC     wglDestroyPbufferARB;
-    PFNWGLQUERYPBUFFERARBPROC       wglQueryPbufferARB;
-    PFNWGLGETPBUFFERDCARBPROC       wglGetPbufferDCARB;
-    PFNWGLCREATEPBUFFERARBPROC      wglCreatePbufferARB;
-    PFNWGLRELEASEPBUFFERDCARBPROC   wglReleasePbufferDCARB;
+    glm::mat4 projectionMatrix;
+    glm::mat4 modelViewMatrix;
 
-    PFNWGLCHOOSEPIXELFORMATARBPROC          wglChoosePixelFormatARB;
-    PFNWGLGETPIXELFORMATATTRIBFVARBPROC     wglGetPixelFormatAttribfvARB;
-    PFNWGLGETPIXELFORMATATTRIBIVARBPROC     wglGetPixelFormatAttribivARB;
+private:
+
 };
 
 #endif // LAYERED_LAYEREDWINDOW_H

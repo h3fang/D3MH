@@ -3,6 +3,8 @@
 
 #include <windows.h>
 
+#include <stdio.h>
+
 class LayeredBitmap
 {
 public:
@@ -19,6 +21,10 @@ public:
         bmpMem(0)
     {
         hdcMem = CreateCompatibleDC(NULL);
+
+        if (!hdcMem) {
+            fprintf(stderr, "Failed to call CreateCompatibleDC(NULL)\n");
+        }
 
         BITMAPINFO bitmapInfo;
         ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
@@ -37,7 +43,11 @@ public:
                     0, // file mapping object
                     0);
 
-        SelectObject(hdcMem, bmpMem);
+        if (!bmpMem) {
+            fprintf(stderr, "Failed to call CreateDIBSection()\n");
+        }
+
+        bmpOld = SelectObject(hdcMem, bmpMem);
     }
 
     ~LayeredBitmap() {
@@ -49,7 +59,7 @@ public:
     HDC getDC() const { return hdcMem; }
 
 private:
-    HBITMAP bmpOld;
+    HGDIOBJ bmpOld;
     HBITMAP bmpMem;
     HDC hdcMem;
 };

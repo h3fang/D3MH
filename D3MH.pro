@@ -7,7 +7,9 @@ CONFIG += windows c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-LIBS += -lgdi32 -lopengl32 -lglu32
+INCLUDEPATH += ../include
+
+LIBS += -L../lib -lgdi32 -lopengl32 -lglu32 -lglew32s -lfreetype
 
 SOURCES += main.cpp\
     engine/engine.cpp \
@@ -15,7 +17,8 @@ SOURCES += main.cpp\
     process/helper.cpp \
     engine/navmesh.cpp \
     minimapoverlay.cpp \
-    layered/layeredwindow.cpp
+    layered/layeredwindow.cpp \
+    layered/textrenderer.cpp
 
 HEADERS  += \
 	engine/engine.h \
@@ -37,6 +40,7 @@ HEADERS  += \
     layered/layeredbitmap.h \
     layered/layeredwindow.h \
     layered/layeredwindowinfo.h \
-    minimapoverlay.h
+    minimapoverlay.h \
+    layered/textrenderer.h
 
 RC_FILE = default.rc
