@@ -15,22 +15,20 @@
 #include "process/helper.h"
 
 // Vertex shader
-const char* vertexShaderSrc = GLSL(
-    in vec2 pos;
-
-    void main() {
-        gl_Position = vec4(pos, 0.0, 1.0);
-    }
-);
+const char* vertexShaderSrc =
+        "#version 400 core\n"
+        "in vec2 pos;"
+        "void main() {"
+        "   gl_Position = vec4(pos, 0.0, 1.0);"
+        "}";
 
 // Fragment shader
-const char* fragmentShaderSrc = GLSL(
-    out vec4 outColor;
-
-    void main() {
-        outColor = vec4(1.0, 0.0, 0.0, 1.0);
-    }
-);
+const char* fragmentShaderSrc =
+        "#version 400 core\n"
+        "out vec4 outColor;"
+        "void main() {"
+        "   outColor = vec4(1.0, 0.0, 0.0, 1.0);"
+        "}";
 
 MinimapOverlay::MinimapOverlay() :
     LayeredWindow(),

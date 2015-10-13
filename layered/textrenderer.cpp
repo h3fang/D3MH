@@ -1,49 +1,43 @@
 #include "textrenderer.h"
 
-#include <iostream>
+#include <stdio.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
 // Vertex shader
-const char* fontVertexShaderSrc = GLSL(
-    layout (location = 0) in vec4 vertex; // <vec2 pos, vec2 tex>
-    out vec2 TexCoords;
-
-    uniform mat4 projection;
-
-    void main()
-    {
-        gl_Position = projection * vec4(vertex.xy, 0.0, 1.0);
-        TexCoords = vertex.zw;
-    }
-);
+const char* fontVertexShaderSrc =
+        "#version 400 core\n"
+        "layout (location = 0) in vec4 vertex; // <vec2 pos, vec2 tex>"
+        "out vec2 TexCoords;"
+        "uniform mat4 projection;"
+        "void main() {"
+        "   gl_Position = projection * vec4(vertex.xy, 0.0, 1.0);"
+        "   TexCoords = vertex.zw;"
+        "}";
 
 // Fragment shader
-const char* fontFragmentShaderSrc = GLSL(
-    in vec2 TexCoords;
-    out vec4 color;
-
-    uniform sampler2D text;
-    uniform vec3 textColor;
-
-    void main()
-    {
-        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
-        color = vec4(textColor, 1.0) * sampled;
-    }
-);
+const char* fontFragmentShaderSrc =
+        "#version 400 core\n"
+        "in vec2 TexCoords;"
+        "out vec4 color;"
+        "uniform sampler2D text;"
+        "uniform vec3 textColor;"
+        "void main() {"
+        "   vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);"
+        "   color = vec4(textColor, 1.0) * sampled;"
+        "}";
 
 TextRenderer::TextRenderer() :
     shader(new Shader(fontVertexShaderSrc, fontFragmentShaderSrc))
 {
     // All functions return a value different than 0 whenever an error occurred
     if (FT_Init_FreeType(&ft))
-        std::cerr << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+        fprintf(stderr, "ERROR::FREETYPE: Could not init FreeType Library\n");
 
     // Load font as face
     FT_Face face;
     if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
-        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+        fprintf(stderr, "ERROR::FREETYPE: Failed to load font\n");
 
     // Set size to load glyphs as
     FT_Set_Pixel_Sizes(face, 0, 48);
@@ -57,7 +51,7 @@ TextRenderer::TextRenderer() :
         // Load character glyph
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
         {
-            std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+            fprintf(stderr, "ERROR::FREETYTPE: Failed to load Glyph\n");
             continue;
         }
         // Generate texture
