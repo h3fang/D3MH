@@ -35,7 +35,7 @@ bool GetProcessList()
     do
     {
         fprintf( stderr, "\n=====================================================\n" );
-        fwprintf( stderr, L"PROCESS NAME:  %s\n", pe32.szExeFile );
+        fwprintf( stderr, L"PROCESS NAME:  %ls\n", pe32.szExeFile );
         fprintf( stderr, "-------------------------------------------------------\n" );
 
         // Retrieve the priority class.
@@ -92,7 +92,7 @@ DWORD GetProcessIdByName(const wchar_t *name)
 
     if (pid == 0)
     {
-        fwprintf(stderr, L"No process with name [%s] found\n", name);
+        fwprintf(stderr, L"No process with name [%ls] found\n", name);
     }
 
     return pid;
@@ -143,7 +143,7 @@ DWORD GetProcessBaseAddress(DWORD processId, const wchar_t *name)
 
     if( processBaseAddress == 0 )
     {
-        fwprintf( stderr, L"Failed to find module %s\n", name );
+        fwprintf( stderr, L"Failed to find module %ls\n", name );
     }
 
     /* Found module and base address successfully */

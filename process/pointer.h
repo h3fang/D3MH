@@ -18,6 +18,7 @@ public:
     T operator()(const P ptr)
     {
         T result;
+        memset(&result, 0, sizeof(T));
         mem_reader->read(&result, (void*)(current_ptr+ptr), sizeof(T));
         return result;
     }

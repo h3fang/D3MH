@@ -10,29 +10,28 @@
 #include "process/pointer.h"
 #include "process/helper.h"
 
-const float CANVAS_WIDTH = 1500.0f;
+float CANVAS_WIDTH = 1500.0f;
 const float CANVAS_HEIGHT = 1200.0f;
 
 Minimap::Minimap(QWidget *parent) :
-    QWidget(parent, Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint/*|Qt::Tool*/),
+    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint),
     d3Window(NULL),
     draw_minimap(false),
-    size_changed(false)
+    size_changed(false),
+    hotkey_id(0)
 {
     setAttribute(Qt::WA_TranslucentBackground);
-    setAttribute(Qt::WA_TransparentForMouseEvents);
 
     minimapTransform.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
     minimapTransform.rotate(-45.0);
     minimapTransform.scale(-1.0, 1.0);
 
     engine = Engine::getInstance();
+    registerHotKeys();
+
+    showMaximized();
 
     QTimer *t = new QTimer(this);
-    connect(t, SIGNAL(timeout()), this, SLOT(updateD3Data()));
-    t->start(200);
-
-    t = new QTimer(this);
     connect(t, SIGNAL(timeout()), this, SLOT(update()));
     t->start(200);
 }
@@ -43,7 +42,7 @@ Minimap::~Minimap()
         CloseHandle(d3Window);
     }
 
-    UnregisterHotKey(NULL, hotkey_id);
+    UnregisterHotKey((HWND)winId(), hotkey_id);
 }
 
 void Minimap::paintEvent(QPaintEvent *)
@@ -54,19 +53,12 @@ void Minimap::paintEvent(QPaintEvent *)
         return;
     }
 
+    if (engine) {
+        engine->update();
+    }
+
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
-    auto s = this->size();
-    s.setWidth(((float)s.width())/s.height()*CANVAS_HEIGHT);
-    p.setWindow(0, 0, s.width(), CANVAS_HEIGHT);
-
-    if (size_changed) {
-        minimapTransform.reset();
-        minimapTransform.translate(s.width() / 2.0, CANVAS_HEIGHT / 2.0);
-        minimapTransform.rotate(-45.0);
-        minimapTransform.scale(-1.0, 1.0);
-        size_changed = false;
-    }
 
     drawInfo(&p);
     drawMinimap(&p);
@@ -74,24 +66,38 @@ void Minimap::paintEvent(QPaintEvent *)
 
 void Minimap::resizeEvent(QResizeEvent *e)
 {
-    size_changed = true;
+    auto s = this->size();
+
+    CANVAS_WIDTH = ((float)s.width())/s.height()*CANVAS_HEIGHT;
+
+    minimapTransform.reset();
+    minimapTransform.scale(s.width()/CANVAS_WIDTH, s.height()/CANVAS_HEIGHT);
+    minimapTransform.translate(CANVAS_WIDTH / 2.0, CANVAS_HEIGHT / 2.0);
+    minimapTransform.rotate(-45.0);
+    minimapTransform.scale(-1.0, 1.0);
 
     QWidget::resizeEvent(e);
 }
 
-void Minimap::updateD3Data()
+bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *result)
 {
-    if (!engine) return;
+    MSG* m = (MSG*)message;
+    if (m->message == WM_HOTKEY && HIWORD(m->lParam) == VK_OEM_3) {
+        qDebug("Hotkey ~ pressed");
+        draw_minimap = !draw_minimap;
+        *result = 0;
+        return true;
+    }
 
-    engine->update();
+    return false;
 }
 
 void Minimap::drawInfo(QPainter *p)
 {
     // draw background
-//    p->setPen(Qt::NoPen);
-//    p->setBrush(QColor(250, 150, 150, 128));
-//    p->drawRect(0, 0, width(),  height());
+    p->setPen(Qt::NoPen);
+    p->setBrush(QColor(250, 150, 150, 128));
+    p->drawRect(0, 0, width(),  height());
 
     p->setPen(QColor(0, 250, 0, 128));
     p->setFont(QFont("Arial", 16));
@@ -113,7 +119,7 @@ void Minimap::drawMinimap(QPainter *p)
 
     p->setTransform(minimapTransform);
 
-//    drawCoordinates(p);
+    drawCoordinates(p);
 
     p->translate(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY);
 
@@ -156,7 +162,7 @@ void Minimap::drawCoordinates(QPainter *p)
 void Minimap::repositionWindow()
 {
     auto r = getD3ClientRect();
-    if (r.isEmpty() || r == this->geometry()) {
+    if (r.isNull() || r == this->geometry()) {
         return;
     }
     else {
@@ -189,6 +195,11 @@ QRect Minimap::getD3ClientRect()
 
 bool Minimap::registerHotKeys()
 {
-    hotkey_id = GlobalAddAtomA("D3 MapHack");
-    return RegisterHotKey(NULL, hotkey_id, 0, VK_OEM_3) == TRUE;
+    hotkey_id = GlobalAddAtomA("DEMH");
+    if (!RegisterHotKey((HWND)winId(), hotkey_id, 0, VK_OEM_3)) {
+        qDebug("Failed to register hotkeys");
+        return false;
+    }
+
+    return true;
 }

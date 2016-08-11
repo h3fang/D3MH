@@ -18,9 +18,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *) override;
     void resizeEvent(QResizeEvent *e) override;
-
-private slots:
-    void updateD3Data();
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
 private:
     void drawInfo(QPainter *p);

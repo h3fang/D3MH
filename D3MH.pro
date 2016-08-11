@@ -8,15 +8,15 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = D3MH
+TARGET = demh
 TEMPLATE = app
 
 DESTDIR = ../bin
 
-CONFIG += c++11
+CONFIG += c++14
 
 SOURCES += main.cpp\
-        minimap.cpp \
+    minimap.cpp \
     engine/engine.cpp \
     process/memoryreader.cpp \
     process/helper.cpp \
@@ -41,3 +41,5 @@ HEADERS  += minimap.h \
     engine/ui.h
 
 RC_FILE = default.rc
+
+QMAKE_CXXFLAGS_RELEASE += -DQT_NO_DEBUG_OUTPUT -msse2 -mfpmath=sse
