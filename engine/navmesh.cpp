@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <algorithm>
 
 #include "process/memoryreader.h"
 #include "process/pointer.h"
@@ -48,13 +49,9 @@ void SceneData::loadFromMemory(const Scene &s)
         fprintf(stderr, "Got 0 serialized records for Sno Id [%u]\n", sno_id);
     }
     else {
-        for (auto it=cells.begin(); it!=cells.end(); ++it) {
-            if (!( (*it).flag & (NavCellFlagW_AllowWalk/*|
-                                 NavCellFlagDW_AllowFlier*/) ) ) {
-                cells.erase(it);
-                --it;
-            }
-        }
+        cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
+            return c.flag & (NavCellFlagW_AllowWalk/* | NavCellFlagDW_AllowFlier*/);
+        }), cells.end());
     }
 }
 
