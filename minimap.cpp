@@ -82,7 +82,7 @@ void Minimap::resizeEvent(QResizeEvent *e)
 bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *result)
 {
     MSG* m = (MSG*)message;
-    if (m->message == WM_HOTKEY && HIWORD(m->lParam) == VK_OEM_3) {
+    if (m->message == WM_HOTKEY && HIWORD(m->lParam) == VK_TAB) {
         qDebug("Hotkey ~ pressed");
         draw_minimap = !draw_minimap;
         *result = 0;
@@ -200,7 +200,7 @@ QRect Minimap::getD3ClientRect()
 bool Minimap::registerHotKeys()
 {
     hotkey_id = GlobalAddAtomA("DEMH");
-    if (!RegisterHotKey((HWND)winId(), hotkey_id, 0, VK_OEM_3)) {
+    if (!RegisterHotKey((HWND)winId(), hotkey_id, 0, VK_TAB)) {
         qDebug("Failed to register hotkeys");
         return false;
     }
