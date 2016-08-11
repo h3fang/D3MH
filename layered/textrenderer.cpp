@@ -103,6 +103,11 @@ TextRenderer::TextRenderer() :
 TextRenderer::~TextRenderer()
 {
     delete shader;
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
+    for (auto it=Characters.begin(); it!=Characters.end(); ++it ) {
+        glDeleteTextures(1, &(it->second.TextureID));
+    }
 }
 
 void TextRenderer::RenderText(const std::string &text, GLfloat x, GLfloat y, GLfloat scale, const glm::vec3 &color, const glm::mat4 &mvp)
