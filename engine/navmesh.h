@@ -12,9 +12,9 @@ namespace D3 {
 class SceneData
 {
 public:
-    DWORD id;
-    DWORD sno_id;
-    DWORD levelArea_sno_id;
+    int id;
+    int sno_id;
+    int levelArea_sno_id;
     Vec3 min;
     Vec3 max;
     std::vector<NavCell> cells;
@@ -46,7 +46,7 @@ public:
 
 private:
     bool cleared;
-    DWORD last_level_area_sno_id;
+    int last_level_area_sno_id;
 };
 
 }

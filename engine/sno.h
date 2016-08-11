@@ -140,10 +140,10 @@ public:
 class SnoDefinition
 {
 public:
-    DWORD x00_Id;                 // 0x000
+    int x00_Id;                 // 0x000
     char unk[3];                // 0x004
     char x07_SnoGroupId;        // 0x007
-    DWORD x08_Size;             // 0x008
+    int x08_Size;               // 0x008
     DWORD pSNOAddr;             // 0x00C
 };
 

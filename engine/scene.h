@@ -7,27 +7,27 @@ namespace D3 {
 
 // sizeof = 0x6C4
 struct Scene {
-    DWORD x000_Id;
-    DWORD x004_NavMeshId;
-    DWORD x008_WorldId;
+    int x000_Id;
+    int x004_NavMeshId;
+    int x008_WorldId;
     int _x00C;
     int _x010;
     int _x014;
-    DWORD x018_LevelAreaSnoId;
+    int x018_LevelAreaSnoId;
     int _x01C;
     int _x020;
     int _x024;
-    DWORD _x028_PortalWorldSnoId;
+    int _x028_PortalWorldSnoId;
     int _x02C;
     int _x030;
     int _x034;
     int _x038;
     int _x03C;
-    DWORD x040_MusicSnoId;
-    DWORD x044_AmbientSoundSnoId;
-    DWORD x048_ReverbSnoId;
-    DWORD x04C_WeatherSnoId;
-    DWORD x050_WorldsSnoId;
+    int x040_MusicSnoId;
+    int x044_AmbientSoundSnoId;
+    int x048_ReverbSnoId;
+    int x04C_WeatherSnoId;
+    int x050_WorldsSnoId;
     int _x054;
     int _x058;
     int _x05C;
@@ -65,7 +65,7 @@ struct Scene {
     int _x0DC;
     int _x0E0;
     int _x0E4;
-    DWORD x0E8_SceneSnoId;
+    int x0E8_SceneSnoId;
     int x0EC_StructStart;
     int _x0F0;
     int _x0F4;
@@ -119,7 +119,7 @@ struct Scene {
     int _x1B4;
     int _x1B8;
     int _x1BC;
-    DWORD x1C0_SceneSnoId_;
+    int x1C0_SceneSnoId_;
     int _x1C4;
     int _x1C8;
     int _x1CC;
@@ -165,7 +165,7 @@ struct Scene {
     int _x26C;
     int _x270;
     int _x274;
-    DWORD x278_AppearanceSnoId;
+    int x278_AppearanceSnoId;
     int x27C_StructStart_Min44Bytes;
     int _x280;
     int _x284;
@@ -185,15 +185,15 @@ struct Scene {
 class SceneRevealInfo
 {
 public:
-    DWORD x00_SceneSnoId;
-    DWORD x04_SceneId_;
-    DWORD x08_WorldId_;
-    DWORD x0C_TextureSnoId;
+    int x00_SceneSnoId;
+    int x04_SceneId_;
+    int x08_WorldId_;
+    int x0C_TextureSnoId;
     float x10_MinX;
     float x14_MinY;
     float x18_MaxX;
     float x1C_MaxY;
-    DWORD x20_TextureSnoId_;
+    int x20_TextureSnoId_;
     char* x24_OpacityMask; // 8 bits-per-channel grayscale channel
     int x28_OpacityMaskWidth;
     int x2C_OpacityMaskHeight;
