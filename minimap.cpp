@@ -95,9 +95,9 @@ bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *
 void Minimap::drawInfo(QPainter *p)
 {
     // draw background
-    p->setPen(Qt::NoPen);
-    p->setBrush(QColor(250, 150, 150, 128));
-    p->drawRect(0, 0, width(),  height());
+//    p->setPen(Qt::NoPen);
+//    p->setBrush(QColor(250, 150, 150, 128));
+//    p->drawRect(0, 0, width(),  height());
 
     p->setPen(QColor(0, 250, 0, 128));
     p->setFont(QFont("Arial", 16));
@@ -115,6 +115,10 @@ void Minimap::drawInfo(QPainter *p)
 
 void Minimap::drawMinimap(QPainter *p)
 {
+    if (!draw_minimap) {
+        return;
+    }
+
     p->save();
 
     p->setTransform(minimapTransform);
@@ -124,24 +128,24 @@ void Minimap::drawMinimap(QPainter *p)
     p->translate(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY);
 
 
-    QVector<QRectF> scene_cells;
+    QVector<QRectF> scene_cells, scene_grids;
     scene_cells.reserve(100*engine->navMesh->sceneData.size());
 
     p->setPen(QColor(0, 255, 0));
     p->setBrush(QColor(0, 128, 0, 64));
 
     for (auto &pair : engine->navMesh->sceneData) {
-        D3::SceneData *s = pair.second;
+        D3::SceneData* s = pair.second;
 
-        p->drawRect(QRectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
+        scene_grids.push_back(QRectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
 
         for (D3::NavCell &c: s->cells) {
             QRectF r_cell(c.min.x+s->min.x, c.min.y+s->min.y, c.max.x-c.min.x, c.max.y-c.min.y);
-            scene_cells.append(r_cell);
+            scene_cells.push_back(r_cell);
         }
     }
 
-//    p->drawRects(scene_grids);
+    p->drawRects(scene_grids);
 
     p->setPen(QColor(0, 0, 250));
     p->setBrush(QColor(0, 0, 250, 64));

@@ -1,7 +1,8 @@
 #include "navmesh.h"
 
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
+
 #include <algorithm>
 
 #include "process/memoryreader.h"
@@ -111,11 +112,11 @@ void NavMesh::update()
     for (int i = 0; i < c.x108_MaxIndex; ++i) {
         Scene s = Pointer<Scene>()(c.x11C_PtrItems+i*c.x104_ItemSize);
 
-        if (s.x000_Id == 0xffffffff) {
+        if (s.x000_Id < 0) {
             continue;
         }
 
-        SceneData *sd = sceneData[s.x000_Id];
+        SceneData* sd = sceneData[s.x000_Id];
         if (sd == 0) {
             sceneData[s.x000_Id] = new SceneData(s);
         }
@@ -139,7 +140,7 @@ void NavMesh::clear()
 void NavMesh::clearScene()
 {
     for (auto it=sceneData.begin(); it!=sceneData.end(); ++it) {
-        SceneData *sd = (*it).second;
+        SceneData* sd = (*it).second;
         if(sd->levelArea_sno_id != last_level_area_sno_id){
             delete (*it).second;
             sceneData.erase(it);
