@@ -17,7 +17,16 @@ public:
 
 public:
     SceneSnoData();
+    SceneSnoData(int sno_id);
     SceneSnoData(AssetScene *sno_ptr);
+
+    ~SceneSnoData();
+
+    bool save();
+    bool load(int sno_id);
+
+private:
+    bool cached;
 };
 
 typedef std::shared_ptr<SceneSnoData> SceneSnoDataPtr;

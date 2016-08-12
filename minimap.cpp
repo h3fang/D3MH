@@ -3,6 +3,8 @@
 #include <QPainter>
 #include <QTimer>
 #include <QResizeEvent>
+#include <QDir>
+#include <QCoreApplication>
 
 #include <math.h>
 
@@ -25,6 +27,9 @@ Minimap::Minimap(QWidget *parent) :
     minimapTransform.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
     minimapTransform.rotate(-45.0);
     minimapTransform.scale(-1.0, 1.0);
+
+    QDir dir(QCoreApplication::applicationDirPath());
+    dir.mkdir("cache");
 
     engine = Engine::getInstance();
     registerHotKeys();

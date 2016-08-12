@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cmath>
 
+#include <fstream>
 #include <iostream>
 #include <algorithm>
 
@@ -16,16 +17,18 @@ namespace D3 {
 std::unordered_map<DWORD, SceneSnoDataPtr> NavMesh::snoSceneIdAddrMap;
 
 SceneSnoData::SceneSnoData() :
-    sno_id(-1)
+    sno_id(-1),
+    cached(false)
 {
 }
 
 SceneSnoData::SceneSnoData(int sno_id)
 {
-    load(sno_id);
+    cached = load(sno_id);
 }
 
-SceneSnoData::SceneSnoData(AssetScene* sno_ptr)
+SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
+    cached(false)
 {
     AssetScene s = Pointer<AssetScene>()(sno_ptr);
 
@@ -41,6 +44,55 @@ SceneSnoData::SceneSnoData(AssetScene* sno_ptr)
             return (c.flag & (NavCellFlagW_AllowWalk/* | NavCellFlagDW_AllowFlier*/)) == 0;
         }), cells.end());
     }
+}
+
+SceneSnoData::~SceneSnoData()
+{
+    if (!cached) {
+        save();
+    }
+}
+
+bool SceneSnoData::save()
+{
+    char path[128];
+    snprintf(path, sizeof(path), "./cache/%d", sno_id);
+    std::ofstream file(path, std::ofstream::binary | std::ofstream::trunc);
+    file << cells.size();
+    for (const NavCell &c : cells) {
+        file.write((char *)&c, sizeof(c));
+    }
+
+    cached = file.good();
+    return cached;
+}
+
+bool SceneSnoData::load(int sno_id)
+{
+    char path[128];
+    snprintf(path, sizeof(path), "./cache/%d", sno_id);
+    std::ifstream file(path, std::ifstream::binary);
+    int size = 0;
+    file >> size;
+
+    if (!file.good() || size <=0 || size >1000) {
+        return false;
+    }
+
+    cells.reserve(size);
+
+    for (int i=0; i<size; ++i) {
+        NavCell c;
+        file.read((char *)&c, sizeof(c));
+
+        if (file.fail() || file.bad()) {
+            cells.clear();
+            return false;
+        }
+    }
+
+    cached = true;
+    return true;
 }
 
 SceneData::SceneData(const Scene &s)
@@ -65,8 +117,17 @@ void SceneData::loadFromMemory(const Scene &s)
     sceneSnoDataPtr = NavMesh::snoSceneIdAddrMap[sno_id];
 
     if (!sceneSnoDataPtr) {
+        SceneSnoDataPtr ss = std::make_shared<SceneSnoData>();
+        if (ss->load(sno_id)) {
+            NavMesh::snoSceneIdAddrMap[sno_id] = ss;
+            sceneSnoDataPtr = ss;
+        }
+        else {
+            fprintf(stderr, "Failed to load AssetScene for id [%u]\n", sno_id);
+        }
+    }
+    else {
         fprintf(stderr, "No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap\n", sno_id);
-        return;
     }
 }
 
