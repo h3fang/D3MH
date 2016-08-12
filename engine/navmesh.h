@@ -29,8 +29,8 @@ public:
 class NavMesh
 {
 public:
-    static std::unordered_map<DWORD, DWORD> snoSceneIdAddrMap;
-    std::unordered_map<DWORD, SceneData*> sceneData;
+    static std::unordered_map<int, DWORD> snoSceneIdAddrMap;
+    std::unordered_map<int, SceneData*> sceneData;
 
 public:
     NavMesh();

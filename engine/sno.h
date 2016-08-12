@@ -6,21 +6,22 @@
 
 namespace D3 {
 
-//sizeof = 0x10
-class MemHeader
+//sizeof = 0x0C
+class SNOHeader
 {
 public:
-    DWORD id;				// 0x000
-    DWORD pad_004[3];		// 0x004
+    DWORD x00_SnoId;		// 0x000
+    int x04_LockCount;      // 0x004
+    int x08_Flags;          // 0x008, 1 = DoNotPurge
 };
 
-//sizeof = 0x20
-class FileHeader
+//sizeof = 0x10
+class SNOFileHeader
 {
     DWORD deadbeef;			// 0x000
-    DWORD snoGroup;			// 0x004
-    DWORD pad_008[2];		// 0x008
-    MemHeader mempart;		// 0x010
+    DWORD Reserved0;		// 0x004
+    DWORD Reserved1;		// 0x008
+    DWORD Reserved2;		// 0x010
 };
 
 //sizeof = 0x10
@@ -37,8 +38,8 @@ public:
 class DataPtr2
 {
 public:
-    DWORD file_offset;		// 0x000
-    DWORD size;				// 0x004
+    int file_offset;		// 0x000
+    int size;				// 0x004
 };
 
 //sizeof = 0x8
@@ -96,7 +97,7 @@ public:
 class NavZoneDef
 {
 public:
-    DWORD NavCellCount;			// 0x000
+    int NavCellCount;			// 0x000
     DWORD pad_004[3];			// 0x004
     DataPtr2 NavCells;			// 0x010
     DWORD NeighbourCount;		// 0x018
@@ -115,10 +116,11 @@ public:
 };
 
 //sizeof = 210
-class SnoScene
+class AssetScene
 {
 public:
-    MemHeader header;			// 0x000
+    SNOHeader header;			// 0x000
+    int x00C;                   // 0x00C
     AABB AABBBounds;			// 0x010
     AABB AABBMarketSetBounds;	// 0x028
     NavMeshDef navmesh;			// 0x040
@@ -144,7 +146,7 @@ public:
     char unk[3];                // 0x004
     char x07_SnoGroupId;        // 0x007
     int x08_Size;               // 0x008
-    DWORD pSNOAddr;             // 0x00C
+    DWORD x0C_pSNOAddr;         // 0x00C
 };
 
 // SizeOf = 0x84;

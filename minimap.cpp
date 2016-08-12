@@ -83,7 +83,6 @@ bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *
 {
     MSG* m = (MSG*)message;
     if (m->message == WM_HOTKEY && HIWORD(m->lParam) == VK_TAB) {
-        qDebug("Hotkey ~ pressed");
         draw_minimap = !draw_minimap;
         *result = 0;
         return true;

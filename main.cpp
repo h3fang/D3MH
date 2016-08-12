@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     qDebug("sizeof ExpandableContainer %#x", sizeof(D3::ExpandableContainer<void>));
     qDebug("sizeof Scene %#x", sizeof(D3::Scene));
     qDebug("sizeof LocalData %#x", sizeof(D3::LocalData));
-    qDebug("sizeof SnoScene %#x", sizeof(D3::SnoScene));
+    qDebug("sizeof AssetScene %#x", sizeof(D3::AssetScene));
     qDebug("sizeof NavZoneDef %#x", sizeof(D3::NavZoneDef));
     qDebug("sizeof SnoDefinition %#x", sizeof(D3::SnoDefinition));
     qDebug("sizeof LevelArea %#x", sizeof(D3::LevelArea));

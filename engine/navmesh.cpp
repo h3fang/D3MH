@@ -12,7 +12,7 @@
 
 namespace D3 {
 
-std::unordered_map<DWORD, DWORD> NavMesh::snoSceneIdAddrMap;
+std::unordered_map<int, DWORD> NavMesh::snoSceneIdAddrMap;
 
 SceneData::SceneData(const Scene &s)
 {
@@ -40,7 +40,7 @@ void SceneData::loadFromMemory(const Scene &s)
         return;
     }
 
-    SnoScene ss = Pointer<SnoScene>()(ss_addr);
+    AssetScene ss = Pointer<AssetScene>()(ss_addr);
 
     cells.clear();
 
@@ -51,7 +51,7 @@ void SceneData::loadFromMemory(const Scene &s)
     }
     else {
         cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
-            return c.flag & (NavCellFlagW_AllowWalk/* | NavCellFlagDW_AllowFlier*/);
+            return (c.flag & (NavCellFlagW_AllowWalk/* | NavCellFlagDW_AllowFlier*/)) == 0;
         }), cells.end());
     }
 }
@@ -96,7 +96,7 @@ void NavMesh::update()
 {
     parseMemorySnoScene();
 
-    DWORD level_area_sno_id = Pointer<DWORD>()(Addr_LevelArea,0x044);
+    int level_area_sno_id = Pointer<int>()(Addr_LevelArea,0x044);
 
     if(level_area_sno_id != last_level_area_sno_id){
         last_level_area_sno_id = level_area_sno_id;
@@ -165,7 +165,7 @@ void NavMesh::parseMemorySnoScene()
 
     for (int i = 0; i < c.x108_MaxIndex; ++i) {
         SnoDefinition d = Pointer<SnoDefinition>()(c.x11C_PtrItems+i*c.x104_ItemSize);
-        if(d.x00_Id == 0xffffffff || d.x07_SnoGroupId != (char)SnoGroupId_Scene){
+        if(d.x00_Id != -1 || d.x07_SnoGroupId != (char)SnoGroupId_Scene){
             continue;
         }
         snoSceneIdAddrMap[Pointer<DWORD>()(d.pSNOAddr)] = d.pSNOAddr;
