@@ -1,8 +1,6 @@
 #ifndef UTILITIES_POINTER_H
 #define UTILITIES_POINTER_H
 
-#include <vector>
-
 #include "memoryreader.h"
 
 template<class T>
@@ -10,8 +8,8 @@ class Pointer
 {
 public:
     Pointer() :
-        current_ptr(0),
-        mem_reader(MemoryReader::instance())
+        current_ptr(0)/*,
+        mem_reader(MemoryReader::instance())*/
     {}
 
     template<class P>
@@ -33,7 +31,10 @@ public:
 
 private:
     unsigned long current_ptr;
-    MemoryReader *mem_reader;
+    static MemoryReader *mem_reader;
 };
+
+template<class T>
+MemoryReader* Pointer<T>::mem_reader = MemoryReader::instance();
 
 #endif // UTILITIES_POINTER_H
