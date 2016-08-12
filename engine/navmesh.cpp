@@ -12,7 +12,30 @@
 
 namespace D3 {
 
-std::unordered_map<int, DWORD> NavMesh::snoSceneIdAddrMap;
+std::unordered_map<DWORD, SceneSnoData> NavMesh::snoSceneIdAddrMap;
+
+SceneSnoData::SceneSnoData() :
+    sno_id(-1)
+{
+}
+
+SceneSnoData::SceneSnoData(DWORD sno_ptr)
+{
+    AssetScene s = Pointer<AssetScene>()(sno_ptr);
+
+    sno_id = s.header.x00_SnoId;
+
+    NavMesh::getSerializedRecords(cells, s.NavZone.NavCells, sno_ptr);
+
+    if (cells.empty()) {
+        fprintf(stderr, "Got 0 serialized records for Sno Id [%u]\n", sno_id);
+    }
+    else {
+        cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
+            return (c.flag & (NavCellFlagW_AllowWalk/* | NavCellFlagDW_AllowFlier*/)) == 0;
+        }), cells.end());
+    }
+}
 
 SceneData::SceneData(const Scene &s)
 {
@@ -33,27 +56,14 @@ void SceneData::loadFromMemory(const Scene &s)
     max.y = s.x178_MeshMaxY;
     max.z = s.x104_MeshMinZ; //there is no max z, so consider all grid cells flat
 
-    DWORD ss_addr = NavMesh::snoSceneIdAddrMap[sno_id];
+    SceneSnoData ss = NavMesh::snoSceneIdAddrMap[sno_id];
 
-    if (ss_addr == 0) {
-        fprintf(stderr, "No record for SnoScene id [%u] in NavMesh::snoSceneIdAddrMap\n", sno_id);
+    if (ss.sno_id == -1) {
+        fprintf(stderr, "No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap\n", sno_id);
         return;
     }
 
-    AssetScene ss = Pointer<AssetScene>()(ss_addr);
-
-    cells.clear();
-
-    NavMesh::getSerializedRecords(cells, ss.NavZone.NavCells, ss_addr);
-
-    if (cells.empty()) {
-        fprintf(stderr, "Got 0 serialized records for Sno Id [%u]\n", sno_id);
-    }
-    else {
-        cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
-            return (c.flag & (NavCellFlagW_AllowWalk/* | NavCellFlagDW_AllowFlier*/)) == 0;
-        }), cells.end());
-    }
+    cells = ss.cells;
 }
 
 template<class T>
@@ -116,9 +126,9 @@ void NavMesh::update()
             continue;
         }
 
-        SceneData* sd = sceneData[s.x000_Id];
+        SceneData* sd = sceneData[s.x0E8_SceneSnoId];
         if (sd == 0) {
-            sceneData[s.x000_Id] = new SceneData(s);
+            sceneData[s.x0E8_SceneSnoId] = new SceneData(s);
         }
         else {
             sd->loadFromMemory(s);
@@ -132,7 +142,6 @@ void NavMesh::clear()
 {
     if (!cleared) {
         clearScene();
-        clearSnoScene();
         cleared = true;
     }
 }
@@ -148,11 +157,6 @@ void NavMesh::clearScene()
     }
 }
 
-void NavMesh::clearSnoScene()
-{
-    snoSceneIdAddrMap.clear();
-}
-
 void NavMesh::parseMemorySnoScene()
 {
     Container<SnoDefinition> c = Pointer<Container<SnoDefinition>>()(Addr_SnoGroupByCode+sizeof(void*)*(int)(SnoGroupId_Scene),
@@ -165,10 +169,12 @@ void NavMesh::parseMemorySnoScene()
 
     for (int i = 0; i < c.x108_MaxIndex; ++i) {
         SnoDefinition d = Pointer<SnoDefinition>()(c.x11C_PtrItems+i*c.x104_ItemSize);
-        if(d.x00_Id != -1 || d.x07_SnoGroupId != (char)SnoGroupId_Scene){
+        if(d.x00_Id == -1 || d.x07_SnoGroupId != (char)SnoGroupId_Scene){
             continue;
         }
-        snoSceneIdAddrMap[Pointer<DWORD>()(d.pSNOAddr)] = d.pSNOAddr;
+
+        SceneSnoData s(d.x0C_pSNOAddr);
+        snoSceneIdAddrMap[s.sno_id] = s;
     }
 }
 

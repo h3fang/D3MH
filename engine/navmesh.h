@@ -9,6 +9,17 @@
 
 namespace D3 {
 
+class SceneSnoData
+{
+public:
+    int sno_id;
+    std::vector<NavCell> cells;
+
+public:
+    SceneSnoData();
+    SceneSnoData(DWORD sno_ptr);
+};
+
 class SceneData
 {
 public:
@@ -29,7 +40,7 @@ public:
 class NavMesh
 {
 public:
-    static std::unordered_map<int, DWORD> snoSceneIdAddrMap;
+    static std::unordered_map<DWORD, SceneSnoData> snoSceneIdAddrMap;
     std::unordered_map<int, SceneData*> sceneData;
 
 public:

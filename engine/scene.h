@@ -65,7 +65,7 @@ struct Scene {
     int _x0DC;
     int _x0E0;
     int _x0E4;
-    int x0E8_SceneSnoId;
+    DWORD x0E8_SceneSnoId;
     int x0EC_StructStart;
     int _x0F0;
     int _x0F4;
