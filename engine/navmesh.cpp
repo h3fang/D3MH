@@ -22,12 +22,14 @@ SceneSnoData::SceneSnoData() :
 {
 }
 
-SceneSnoData::SceneSnoData(int sno_id)
+SceneSnoData::SceneSnoData(int sno_id) :
+    sno_id(-1)
 {
     cached = load(sno_id);
 }
 
 SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
+    sno_id(-1),
     cached(false)
 {
     AssetScene s = Pointer<AssetScene>()(sno_ptr);
@@ -92,6 +94,7 @@ bool SceneSnoData::load(int sno_id)
     }
 
     cached = true;
+    this->sno_id = sno_id;
     return true;
 }
 
