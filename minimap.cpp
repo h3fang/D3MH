@@ -60,7 +60,7 @@ void Minimap::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    drawInfo(&p);
+//    drawInfo(&p);
     drawMinimap(&p);
 }
 
@@ -134,11 +134,11 @@ void Minimap::drawMinimap(QPainter *p)
     p->setBrush(QColor(0, 128, 0, 64));
 
     for (auto &pair : engine->navMesh->sceneData) {
-        D3::SceneData* s = pair.second;
+        D3::SceneDataPtr s = pair.second;
 
         scene_grids.push_back(QRectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
 
-        for (D3::NavCell &c: s->cells) {
+        for (D3::NavCell &c: s->sceneSnoDataPtr->cells) {
             QRectF r_cell(c.min.x+s->min.x, c.min.y+s->min.y, c.max.x-c.min.x, c.max.y-c.min.y);
             scene_cells.push_back(r_cell);
         }

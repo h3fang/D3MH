@@ -17,8 +17,10 @@ public:
 
 public:
     SceneSnoData();
-    SceneSnoData(DWORD sno_ptr);
+    SceneSnoData(AssetScene *sno_ptr);
 };
+
+typedef std::shared_ptr<SceneSnoData> SceneSnoDataPtr;
 
 class SceneData
 {
@@ -28,7 +30,7 @@ public:
     int levelArea_sno_id;
     Vec3 min;
     Vec3 max;
-    std::vector<NavCell> cells;
+    SceneSnoDataPtr sceneSnoDataPtr;
     bool finished;
 
 public:
@@ -37,11 +39,13 @@ public:
     void loadFromMemory(const Scene &s);
 };
 
+typedef std::shared_ptr<SceneData> SceneDataPtr;
+
 class NavMesh
 {
 public:
-    static std::unordered_map<DWORD, SceneSnoData> snoSceneIdAddrMap;
-    std::unordered_map<int, SceneData*> sceneData;
+    static std::unordered_map<DWORD, SceneSnoDataPtr> snoSceneIdAddrMap;
+    std::unordered_map<int, SceneDataPtr> sceneData;
 
 public:
     NavMesh();
