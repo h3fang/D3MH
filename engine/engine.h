@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <utils/precisetimer.h>
+
 #include "structs.h"
 
 class MemoryReader;
@@ -49,12 +51,15 @@ public:
     static Engine *getInstance();
     void update();
 
+    bool isInGame();
+
 private:
     Engine();
     Engine(Engine&) = delete;
     Engine& operator=(const Engine &) = delete;
 
     MemoryReader *memoryReader;
+    PreciseTimer nav_mesh_timer;
 };
 
 #endif // D3MH_ENGINE_H

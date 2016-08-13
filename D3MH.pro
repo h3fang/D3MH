@@ -15,6 +15,8 @@ DESTDIR = ../bin
 
 CONFIG += c++14
 
+INCLUDEPATH += ../ISS/include
+
 SOURCES += main.cpp\
     minimap.cpp \
     engine/engine.cpp \
