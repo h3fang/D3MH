@@ -24,6 +24,7 @@ public:
 
     bool save();
     bool load(int sno_id);
+    inline bool isCached() { return cached; }
 
 private:
     bool cached;

@@ -4,8 +4,9 @@
 #include <cmath>
 
 #include <fstream>
-#include <iostream>
 #include <algorithm>
+
+#include <QDebug>
 
 #include "process/memoryreader.h"
 #include "process/pointer.h"
@@ -39,7 +40,7 @@ SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
     NavMesh::getSerializedRecords(cells, s.NavZone.NavCells, (DWORD)sno_ptr);
 
     if (cells.empty()) {
-        fprintf(stderr, "Got 0 serialized records for Sno Id [%u]\n", sno_id);
+        qDebug("Got 0 serialized records for Sno Id [%u]\n", sno_id);
     }
     else {
         cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
@@ -57,6 +58,10 @@ SceneSnoData::~SceneSnoData()
 
 bool SceneSnoData::save()
 {
+    if (sno_id == -1 || cells.empty()) {
+        return false;
+    }
+
     char path[128];
     snprintf(path, sizeof(path), "./cache/%d", sno_id);
     std::ofstream file(path, std::ofstream::binary | std::ofstream::trunc);
@@ -119,18 +124,19 @@ void SceneData::loadFromMemory(const Scene &s)
 
     sceneSnoDataPtr = NavMesh::snoSceneIdAddrMap[sno_id];
 
-    if (!sceneSnoDataPtr) {
-        SceneSnoDataPtr ss = std::make_shared<SceneSnoData>();
-        if (ss->load(sno_id)) {
+    if (NavMesh::snoSceneIdAddrMap.find(sno_id) == NavMesh::snoSceneIdAddrMap.end()) {
+        qDebug("No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap\n", sno_id);
+        SceneSnoDataPtr ss = std::make_shared<SceneSnoData>(sno_id);
+        if (ss->isCached()) {
             NavMesh::snoSceneIdAddrMap[sno_id] = ss;
             sceneSnoDataPtr = ss;
         }
         else {
-            fprintf(stderr, "Failed to load AssetScene for id [%u]\n", sno_id);
+            qDebug("Failed to load AssetScene for id [%u]\n", sno_id);
         }
     }
     else {
-        fprintf(stderr, "No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap\n", sno_id);
+        sceneSnoDataPtr = NavMesh::snoSceneIdAddrMap[sno_id];
     }
 }
 
@@ -152,7 +158,7 @@ bool NavMesh::getSerializedRecords(std::vector<T> &out, DataPtr2 ptr, DWORD dwBa
         T data;
 
         if (!MemoryReader::instance()->read(&data, (void*)dwDataStart, sizeof(T))) {
-            fprintf(stderr, "Failed to read memory in NavMesh::getSerializedRecords()\n");
+            qDebug("Failed to read memory in NavMesh::getSerializedRecords()\n");
             out.clear();
             return false;
         }
@@ -194,12 +200,11 @@ void NavMesh::update()
             continue;
         }
 
-        SceneDataPtr sd = sceneData[s.x0E8_SceneSnoId];
-        if (sd == 0) {
-            sceneData[s.x0E8_SceneSnoId] = std::make_shared<SceneData>(s);
+        if (sceneData.find(s.x0E8_SceneSnoId) != sceneData.end()) {
+            sceneData[s.x0E8_SceneSnoId]->loadFromMemory(s);
         }
         else {
-            sd->loadFromMemory(s);
+            sceneData[s.x0E8_SceneSnoId] = std::make_shared<SceneData>(s);
         }
     }
 
@@ -216,10 +221,12 @@ void NavMesh::clear()
 
 void NavMesh::clearScene()
 {
-    for (auto it=sceneData.begin(); it!=sceneData.end(); ++it) {
-        SceneDataPtr sd = (*it).second;
-        if(sd->levelArea_sno_id != last_level_area_sno_id){
-            sceneData.erase(it);
+    for (auto it=sceneData.begin(); it!=sceneData.end();) {
+        if(it->second->levelArea_sno_id != last_level_area_sno_id){
+            it = sceneData.erase(it);
+        }
+        else {
+            ++it;
         }
     }
 }

@@ -89,8 +89,8 @@ bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *
     MSG* m = (MSG*)message;
     if (m->message == WM_HOTKEY && HIWORD(m->lParam) == VK_TAB) {
         draw_minimap = !draw_minimap;
-        *result = 0;
-        return true;
+//        *result = 0;
+//        return true;
     }
 
     return false;
@@ -136,12 +136,16 @@ void Minimap::drawMinimap(QPainter *p)
     scene_cells.reserve(100*engine->navMesh->sceneData.size());
 
     p->setPen(QColor(0, 255, 0));
-    p->setBrush(QColor(0, 128, 0, 64));
+    p->setBrush(QColor(0, 128, 0, 32));
 
-    for (auto &pair : engine->navMesh->sceneData) {
+    for (const auto& pair : engine->navMesh->sceneData) {
         D3::SceneDataPtr s = pair.second;
 
         scene_grids.push_back(QRectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
+
+        if (!s->sceneSnoDataPtr) {
+            break;
+        }
 
         for (D3::NavCell &c: s->sceneSnoDataPtr->cells) {
             QRectF r_cell(c.min.x+s->min.x, c.min.y+s->min.y, c.max.x-c.min.x, c.max.y-c.min.y);
@@ -151,8 +155,8 @@ void Minimap::drawMinimap(QPainter *p)
 
     p->drawRects(scene_grids);
 
-    p->setPen(QColor(0, 0, 250));
-    p->setBrush(QColor(0, 0, 250, 64));
+    p->setPen(QColor(0, 0, 255));
+    p->setBrush(QColor(0, 0, 255, 32));
     p->drawRects(scene_cells);
 
     p->restore();
