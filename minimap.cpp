@@ -38,7 +38,7 @@ Minimap::Minimap(QWidget *parent) :
 
     QTimer *t = new QTimer(this);
     connect(t, SIGNAL(timeout()), this, SLOT(update()));
-    t->start(200);
+    t->start(50);
 }
 
 Minimap::~Minimap()
@@ -125,7 +125,8 @@ void Minimap::drawMinimap(QPainter *p)
 
     p->setTransform(minimapTransform);
 
-    drawCoordinates(p);
+    p->save();
+//    drawCoordinates(p);
 
     p->translate(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY);
 
@@ -147,13 +148,20 @@ void Minimap::drawMinimap(QPainter *p)
         }
     }
 
-    p->setPen(QColor(0, 0, 255));
-    p->setBrush(Qt::transparent);
-    p->drawRects(scene_grids);
+//    p->setPen(QColor(0, 0, 255));
+//    p->setBrush(Qt::transparent);
+//    p->drawRects(scene_grids);
 
     p->setPen(QColor(0, 255, 0));
     p->setBrush(QColor(0, 128, 0, 16));
     p->drawRects(scene_cells);
+
+    p->restore();
+
+    // self
+    p->setPen(Qt::red);
+    p->setBrush(Qt::red);
+    p->drawEllipse(QPoint(0, 0), 10, 10);
 
     p->restore();
 }
