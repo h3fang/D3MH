@@ -119,7 +119,7 @@ void Minimap::drawInfo(QPainter *p)
 
 void Minimap::drawMinimap(QPainter *p)
 {
-    if (!draw_minimap) {
+    if (!draw_minimap || !engine->isInGame()) {
         return;
     }
 

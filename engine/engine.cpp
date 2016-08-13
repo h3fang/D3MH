@@ -18,12 +18,17 @@ void Engine::update()
     memoryReader->read(&localData, (void *)Addr_LocalData, sizeof(D3::LocalData));
     memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int));
 
-    if (localData.x04_IsNotInGame != 0xCD && localData.x00_IsActorCreated == 1) {
+    if (isInGame()) {
         navMesh->update();
     }
     else {
         navMesh->clear();
     }
+}
+
+bool Engine::isInGame()
+{
+    return localData.x04_IsNotInGame != 0xCD && localData.x00_IsActorCreated == 1;
 }
 
 Engine::Engine():
