@@ -84,13 +84,11 @@ void Minimap::resizeEvent(QResizeEvent *e)
     QWidget::resizeEvent(e);
 }
 
-bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *result)
+bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long */*result*/)
 {
     MSG* m = (MSG*)message;
     if (m->message == WM_HOTKEY && HIWORD(m->lParam) == VK_TAB) {
         draw_minimap = !draw_minimap;
-//        *result = 0;
-//        return true;
     }
 
     return false;
@@ -131,12 +129,8 @@ void Minimap::drawMinimap(QPainter *p)
 
     p->translate(-engine->localData.x24_WorldPosX, -engine->localData.x28_WorldPosY);
 
-
     QVector<QRectF> scene_cells, scene_grids;
     scene_cells.reserve(100*engine->navMesh->sceneData.size());
-
-    p->setPen(QColor(0, 255, 0));
-    p->setBrush(QColor(0, 128, 0, 32));
 
     for (const auto& pair : engine->navMesh->sceneData) {
         D3::SceneDataPtr s = pair.second;
@@ -153,10 +147,12 @@ void Minimap::drawMinimap(QPainter *p)
         }
     }
 
+    p->setPen(QColor(0, 0, 255));
+    p->setBrush(Qt::transparent);
     p->drawRects(scene_grids);
 
-    p->setPen(QColor(0, 0, 255));
-    p->setBrush(QColor(0, 0, 255, 32));
+    p->setPen(QColor(0, 255, 0));
+    p->setBrush(QColor(0, 128, 0, 16));
     p->drawRects(scene_cells);
 
     p->restore();
@@ -189,7 +185,7 @@ QRect Minimap::getD3ClientRect()
     }
 
     if (!d3Window) {
-        qDebug("Failed to find D3 window");
+//        qDebug("Failed to find D3 window");
         return QRect();
     }
 
