@@ -41,12 +41,15 @@ public:
     Vec3 min;
     Vec3 max;
     SceneSnoDataPtr sceneSnoDataPtr;
-    bool finished;
+    bool good;
 
 public:
+    SceneData();
     SceneData(const Scene &s);
 
-    void loadFromMemory(const Scene &s);
+    void fetchCurrent(int sno_id);
+    void fromScene(const Scene &s);
+    bool findSceneSnoData();
 };
 
 typedef std::shared_ptr<SceneData> SceneDataPtr;
@@ -60,6 +63,7 @@ public:
 public:
     NavMesh();
 
+    void loadSceneSnoFiles();
     void update();
     void clear();
     void clearScene();

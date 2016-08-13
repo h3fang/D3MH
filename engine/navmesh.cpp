@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include <QDebug>
+#include <QDir>
 
 #include "process/memoryreader.h"
 #include "process/pointer.h"
@@ -103,12 +104,30 @@ bool SceneSnoData::load(int sno_id)
     return true;
 }
 
-SceneData::SceneData(const Scene &s)
+SceneData::SceneData() :
+    id(-1),
+    sno_id(-1),
+    levelArea_sno_id(-1),
+    min(Vec3{0, 0, 0}),
+    max(Vec3{0, 0, 0}),
+    good(false)
 {
-    loadFromMemory(s);
 }
 
-void SceneData::loadFromMemory(const Scene &s)
+SceneData::SceneData(const Scene &s)
+{
+    fromScene(s);
+}
+
+void SceneData::fetchCurrent(int sno_id)
+{
+    this->sno_id = sno_id;
+    levelArea_sno_id = Pointer<int>()(Addr_LevelArea, 0x44);
+
+    good = findSceneSnoData();
+}
+
+void SceneData::fromScene(const Scene &s)
 {
     id = s.x000_Id;
     sno_id = s.x0E8_SceneSnoId;
@@ -122,21 +141,18 @@ void SceneData::loadFromMemory(const Scene &s)
     max.y = s.x178_MeshMaxY;
     max.z = s.x104_MeshMinZ; //there is no max z, so consider all grid cells flat
 
-    sceneSnoDataPtr = NavMesh::snoSceneIdAddrMap[sno_id];
+    good = findSceneSnoData();
+}
 
+bool SceneData::findSceneSnoData()
+{
     if (NavMesh::snoSceneIdAddrMap.find(sno_id) == NavMesh::snoSceneIdAddrMap.end()) {
         qDebug("No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap\n", sno_id);
-        SceneSnoDataPtr ss = std::make_shared<SceneSnoData>(sno_id);
-        if (ss->isCached()) {
-            NavMesh::snoSceneIdAddrMap[sno_id] = ss;
-            sceneSnoDataPtr = ss;
-        }
-        else {
-            qDebug("Failed to load AssetScene for id [%u]\n", sno_id);
-        }
+        return false;
     }
     else {
         sceneSnoDataPtr = NavMesh::snoSceneIdAddrMap[sno_id];
+        return true;
     }
 }
 
@@ -174,6 +190,25 @@ bool NavMesh::getSerializedRecords(std::vector<T> &out, DataPtr2 ptr, DWORD dwBa
 NavMesh::NavMesh() :
     cleared(true)
 {
+    loadSceneSnoFiles();
+}
+
+void NavMesh::loadSceneSnoFiles()
+{
+    QDir dir("./cache/");
+    auto files = dir.entryList(QDir::Files|QDir::NoSymLinks, QDir::Name);
+    for (QString s : files) {
+        bool ok = false;
+        int sno_id = s.toInt(&ok);
+        if (ok) {
+            SceneSnoDataPtr ss = std::make_shared<SceneSnoData>(sno_id);
+            if (ss->isCached()) {
+                snoSceneIdAddrMap[sno_id] = ss;
+            }
+        }
+    }
+
+    qDebug("loaded %u SceneSno files", snoSceneIdAddrMap.size());
 }
 
 void NavMesh::update()
@@ -201,10 +236,19 @@ void NavMesh::update()
         }
 
         if (sceneData.find(s.x0E8_SceneSnoId) != sceneData.end()) {
-            sceneData[s.x0E8_SceneSnoId]->loadFromMemory(s);
+            sceneData[s.x0E8_SceneSnoId]->fromScene(s);
         }
         else {
             sceneData[s.x0E8_SceneSnoId] = std::make_shared<SceneData>(s);
+        }
+    }
+
+    int sno_id = Pointer<int>()(Addr_LocalData+0x08);
+    if (sceneData.find(sno_id) == sceneData.end()) {
+        SceneDataPtr current = std::make_shared<SceneData>();
+        current->fetchCurrent(sno_id);
+        if (current->good) {
+            sceneData[sno_id] = current;
         }
     }
 
