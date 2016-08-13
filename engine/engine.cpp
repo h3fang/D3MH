@@ -19,7 +19,7 @@ void Engine::update()
     memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int));
 
     if (isInGame()) {
-        if (nav_mesh_timer.start_or_elapsed() > 300) {
+        if (nav_mesh_timer.start_or_elapsed() > 0.3) {
             navMesh->update();
             nav_mesh_timer.start();
         }
