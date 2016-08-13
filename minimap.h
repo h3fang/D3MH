@@ -20,12 +20,13 @@ protected:
     void resizeEvent(QResizeEvent *e) override;
     bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
+private slots:
+    void repositionWindow();
+
 private:
     void drawInfo(QPainter *p);
     void drawMinimap(QPainter *p);
     void drawCoordinates(QPainter *p);
-
-    void repositionWindow();
     QRect getD3ClientRect();
 
     bool registerHotKeys();

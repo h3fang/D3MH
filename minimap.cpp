@@ -39,6 +39,10 @@ Minimap::Minimap(QWidget *parent) :
     QTimer *t = new QTimer(this);
     connect(t, SIGNAL(timeout()), this, SLOT(update()));
     t->start(50);
+
+    t = new QTimer(this);
+    connect(t, SIGNAL(timeout()), this, SLOT(repositionWindow()));
+    t->start(500);
 }
 
 Minimap::~Minimap()
@@ -52,8 +56,6 @@ Minimap::~Minimap()
 
 void Minimap::paintEvent(QPaintEvent *)
 {
-    repositionWindow();
-
     if (!d3Window || d3Window != GetForegroundWindow()) {
         return;
     }
