@@ -154,16 +154,15 @@ void Minimap::drawMinimap(QPainter *p)
 //    p->setBrush(Qt::transparent);
 //    p->drawRects(scene_grids);
 
-    p->setPen(QColor(0, 255, 0));
-    p->setBrush(QColor(0, 128, 0, 16));
+    p->setPen(Qt::transparent);
+    p->setBrush(QColor(0, 255, 0, 64));
     p->drawRects(scene_cells);
 
     p->restore();
 
     // self
-    p->setPen(Qt::red);
-    p->setBrush(Qt::red);
-    p->drawEllipse(QPoint(0, 0), 10, 10);
+    p->setBrush(QColor(255, 0, 0, 196));
+    p->drawEllipse(QPoint(0, 0), 7, 7);
 
     p->restore();
 }
