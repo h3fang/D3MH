@@ -13,7 +13,7 @@ enum Addr
 {
 //    Addr_SnoGroupInitializers = 0x01C36944 - 4,
     Addr_SnoGroupByCode = 0x01EA73B0,
-//    Addr_SnoGroups = 0x01DCD164,
+    Addr_SnoGroups = 0x01EA3FE4,
 //    Addr_SnoGroupSearch = 0x01E2021C,
 //    Addr_SnoFilesAsync = 0x01E20220,
     Addr_ObjectManager = 0x01EA60D4,
@@ -22,7 +22,7 @@ enum Addr
     Addr_MapActId = 0x01E30EE0,
     Addr_LocalData = 0x01EA7378,
     Addr_LevelArea = 0x01E30B40,
-//    Addr_LevelAreaName = 0x01D277A8,
+    Addr_LevelAreaName = 0x01E30B70,
 //    Addr_GameplayPreferences = 0x01BA1F94,
     Addr_ContainerManager = 0x01F67720,
 //    Addr_BuffManager = 0x01DB4990,

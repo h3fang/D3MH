@@ -3,7 +3,7 @@
 
 namespace D3 {
 
-#define INVALID_VALUE   0xFFFFFFFF
+const unsigned int INVALID_SNO_ID = 0xFFFFFFFF;
 
 enum SnoGroupId : unsigned int
 {
@@ -87,7 +87,7 @@ enum ActorType
 
 enum MonsterRace
 {
-    MobRace_Unknown = INVALID_VALUE,
+    MobRace_Unknown = INVALID_SNO_ID,
     MobRace_Fallen = 1,
     MobRace_GoatMen = 2,
     MobRace_Rogue = 3,
@@ -102,7 +102,7 @@ enum MonsterRace
 
 enum MonsterType
 {
-    MobType_Unknown = INVALID_VALUE,
+    MobType_Unknown = INVALID_SNO_ID,
     MobType_Undead = 0,
     MobType_Demon = 1,
     MobType_Beast = 2,
@@ -114,9 +114,9 @@ enum MonsterType
     MobType_Helper = 8
 };
 
-enum ItemLocation : unsigned int
+enum ItemLocation
 {
-    ItemLoc_UnknownLoc = 0xFFFFFFFF, //  meaning NPC or item on the ground.
+    ItemLoc_UnknownLoc = INVALID_SNO_ID, //  meaning NPC or item on the ground.
     ItemLoc_Backpack = 0,
     ItemLoc_Head = 1,
     ItemLoc_Torso = 2,
@@ -144,7 +144,7 @@ enum ItemLocation : unsigned int
     ItemLoc_PetNeck = 26
 };
 
-enum NavCellFlagsDW : unsigned int
+enum NavCellFlagsDW
 {
     NavCellFlagDW_AllowWalk = 0x1,
     NavCellFlagDW_AllowFlier = 0x2,
@@ -164,7 +164,7 @@ enum NavCellFlagsDW : unsigned int
     NavCellFlagDW_RoundedCorner3 = 0x8000
 };
 
-enum NavCellFlagsW : unsigned short
+enum NavCellFlagsW
 {
     NavCellFlagW_AllowWalk = 0x1,
     NavCellFlagW_AllowFlier = 0x2,

@@ -5,11 +5,9 @@
 
 namespace D3 {
 
-typedef unsigned char UCHAR;
-typedef uint64_t UINT64;
-typedef unsigned short WORD;
-typedef unsigned int DWORD;
-
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
 struct Vec2
 {
     float x;     // 0x000
@@ -126,14 +124,25 @@ public:
     short   x112_NextIndex;
     int     x114_Free;
     int     x118_NeedsToExpand;
-    DWORD   x11C_PtrItems;
+    uint   x11C_PtrItems;
     int     x120_Allocation;
 };
 
 template <class T> // sizeof = 0x168
-class ExpandableContainer : public Container<T>
+class ExpandableContainer
 {
 public:
+    char    x000_Name[256];
+    int    x100_Capacity;
+    int    x104_ItemSize;
+    int    x108_MaxIndex;
+    int    x10C_Count;
+    short   x110_NextHash;
+    short   x112_NextIndex;
+    int     x114_Free;
+    int     x118_NeedsToExpand;
+    uint   x11C_PtrItems;
+    int     x120_Allocation;
     int     x124;
     int     x128;
     int     _x12C;
@@ -211,18 +220,26 @@ public:
 
 // SizeOf = 0x30; // 48
 template<class T>
-class ListPack : public LinkedList<T>
+class ListPack
 {
 public:
+    LinkedListNode<T>* First;
+    LinkedListNode<T>* Last;
+    int Count;
+    Allocator<LinkedListNode<T>>* NodeAllocator;
     Allocator<LinkedListNode<T>> x10_NodeAllocator;
     int x2C_Boolean;
 };
 
 // SizeOf = 0x14; // 20
 template<class T>
-class ListB : public LinkedList<T>
+class ListB
 {
 public:
+    LinkedListNode<T>* First;
+    LinkedListNode<T>* Last;
+    int Count;
+    Allocator<LinkedListNode<T>>* NodeAllocator;
     int x10_Boolean;
 };
 

@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     Minimap w;
     w.show();
 
-    setbuf(stderr, NULL);
+//    setbuf(stderr, NULL);
 
     qDebug("sizeof ObjectManager %#x %#x", sizeof(D3::ObjectManager), offsetof(D3::ObjectManager, x998_Scenes));
     qDebug("sizeof BasicAllocator %#x", sizeof(D3::BasicAllocator<void>));
@@ -19,10 +19,10 @@ int main(int argc, char *argv[])
     qDebug("sizeof ExpandableContainer %#x", sizeof(D3::ExpandableContainer<void>));
     qDebug("sizeof Scene %#x", sizeof(D3::Scene));
     qDebug("sizeof LocalData %#x", sizeof(D3::LocalData));
-    qDebug("sizeof AssetScene %#x", sizeof(D3::AssetScene));
-    qDebug("sizeof NavZoneDef %#x", sizeof(D3::NavZoneDef));
+    qDebug("sizeof AssetScene %#x %#x", sizeof(D3::AssetScene), offsetof(D3::AssetScene, NavZone));
+    qDebug("sizeof NavZoneDef %#x %#x", sizeof(D3::NavZoneDef), offsetof(D3::NavZoneDef, NavCells));
     qDebug("sizeof SnoDefinition %#x", sizeof(D3::SnoDefinition));
-    qDebug("sizeof LevelArea %#x", sizeof(D3::LevelArea));
+    qDebug("sizeof LevelArea %#x %#x", sizeof(D3::LevelArea), offsetof(D3::LevelArea, x044_SnoId));
 
     return a.exec();
 }

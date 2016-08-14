@@ -6,7 +6,7 @@
 namespace D3 {
 
 struct Actor{ // sizeof = 0x454
-    int x000_Id;
+    uint x000_Id;
     char x004_Name[0x80];
     int x084_SceneId;
     int x088_AcdId;

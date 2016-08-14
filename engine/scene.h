@@ -7,27 +7,27 @@ namespace D3 {
 
 // sizeof = 0x6C4
 struct Scene {
-    int x000_Id;
-    int x004_NavMeshId;
-    int x008_WorldId;
+    uint x000_Id;
+    uint x004_NavMeshId;
+    uint x008_WorldId;
     int _x00C;
     int _x010;
     int _x014;
-    int x018_LevelAreaSnoId;
+    uint x018_LevelAreaSnoId;
     int _x01C;
     int _x020;
     int _x024;
-    int _x028_PortalWorldSnoId;
+    uint _x028_PortalWorldSnoId;
     int _x02C;
     int _x030;
     int _x034;
     int _x038;
     int _x03C;
-    int x040_MusicSnoId;
-    int x044_AmbientSoundSnoId;
-    int x048_ReverbSnoId;
-    int x04C_WeatherSnoId;
-    int x050_WorldsSnoId;
+    uint x040_MusicSnoId;
+    uint x044_AmbientSoundSnoId;
+    uint x048_ReverbSnoId;
+    uint x04C_WeatherSnoId;
+    uint x050_WorldsSnoId;
     int _x054;
     int _x058;
     int _x05C;
@@ -46,8 +46,8 @@ struct Scene {
     int _x090;
     int _x094;
     int _x098;
-    DWORD _x09C_SizeX;
-    DWORD _x0A0_SizeY;
+    uint _x09C_SizeX;
+    uint _x0A0_SizeY;
     float x0A4;
     float x0A8;
     float x0AC;
@@ -65,7 +65,7 @@ struct Scene {
     int _x0DC;
     int _x0E0;
     int _x0E4;
-    DWORD x0E8_SceneSnoId;
+    uint x0E8_SceneSnoId;
     int x0EC_StructStart;
     int _x0F0;
     int _x0F4;
@@ -109,7 +109,7 @@ struct Scene {
     int x18C;
     int _x190;
     int _x194;
-    DWORD x198_Flags;
+    uint x198_Flags;
     int _x19C;
     int _x1A0;
     int x1A4;
@@ -119,7 +119,7 @@ struct Scene {
     int _x1B4;
     int _x1B8;
     int _x1BC;
-    int x1C0_SceneSnoId_;
+    uint x1C0_SceneSnoId_;
     int _x1C4;
     int _x1C8;
     int _x1CC;
@@ -146,7 +146,7 @@ struct Scene {
     int _x220;
     int _x224;
     int _x228;
-    DWORD x22C_Flags;
+    uint x22C_Flags;
     int _x230;
     int _x234;
     int x238_StructStart_Min28Bytes;
@@ -165,7 +165,7 @@ struct Scene {
     int _x26C;
     int _x270;
     int _x274;
-    int x278_AppearanceSnoId;
+    uint x278_AppearanceSnoId;
     int x27C_StructStart_Min44Bytes;
     int _x280;
     int _x284;
@@ -177,8 +177,8 @@ struct Scene {
     int _x29C;
     int _x2A0;
     int _x2A4;
-    UCHAR x2A8_ListB_ActorIds[0x14];
-    UCHAR unknown_0x2BC[0x6C4-0x2BD];
+    uchar x2A8_ListB_ActorIds[0x14];
+    uchar unknown_0x2BC[0x6C4-0x2BD];
 };
 
 // SizeOf = 0x3C; // 60

@@ -8,7 +8,7 @@ namespace D3 {
 // SizeOf = 0x208
 
 struct UIReference {
-    UINT64 x000_Hash;
+    uint64_t x000_Hash;
     char x008_Name[0x200];
 };
 

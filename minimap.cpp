@@ -67,7 +67,7 @@ void Minimap::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-//    drawInfo(&p);
+    drawInfo(&p);
     drawMinimap(&p);
 }
 
@@ -108,7 +108,7 @@ void Minimap::drawInfo(QPainter *p)
 
     p->drawText(QRectF(0, 0, 0.2*p->window().width(), 0.4*p->window().height()), Qt::AlignCenter,
                QString::asprintf("FrameCnt:%u\nAppLoopCnt:%u\nWorldSnoId:%d\nX:%.4f\nY:%.4f\nZ:%.4f\nSceneCnt:%u",
-                                 Pointer<D3::DWORD>()(Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame)),
+                                 Pointer<uint>()(Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame)),
                                  engine->ApplicationLoopCount,
                                  engine->localData.x0C_WorldSnoId,
                                  engine->localData.x24_WorldPosX,
@@ -135,23 +135,21 @@ void Minimap::drawMinimap(QPainter *p)
     QVector<QRectF> scene_cells, scene_grids;
     scene_cells.reserve(100*engine->navMesh->sceneData.size());
 
-    for (const auto& pair : engine->navMesh->sceneData) {
-        D3::SceneDataPtr s = pair.second;
-
+    for (const D3::SceneDataPtr& s : engine->navMesh->sceneData) {
         scene_grids.push_back(QRectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
 
         if (!s->sceneSnoDataPtr) {
             break;
         }
 
-        for (D3::NavCell &c: s->sceneSnoDataPtr->cells) {
+        for (const D3::NavCell &c: s->sceneSnoDataPtr->cells) {
             QRectF r_cell(c.min.x+s->min.x, c.min.y+s->min.y, c.max.x-c.min.x, c.max.y-c.min.y);
             scene_cells.push_back(r_cell);
         }
     }
 
 //    p->setPen(QColor(0, 0, 255));
-//    p->setBrush(Qt::transparent);
+//    p->setBrush(QColor(0, 0, 255, 64));
 //    p->drawRects(scene_grids);
 
     p->setPen(Qt::transparent);
