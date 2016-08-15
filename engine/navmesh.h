@@ -70,7 +70,7 @@ public:
     };
 
     static std::unordered_map<uint, SceneSnoDataPtr> snoSceneIdAddrMap;
-    std::set<SceneDataPtr, SceneDatacomp> sceneData;
+    std::unordered_map<uint, SceneDataPtr> sceneData;
 
 public:
     NavMesh();

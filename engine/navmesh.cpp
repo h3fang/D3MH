@@ -243,15 +243,19 @@ void NavMesh::fetchScene()
             continue;
         }
 
-        sceneData.insert(std::make_shared<SceneData>(s));
+        if (sceneData.find(s.x0E8_SceneSnoId) == sceneData.end()) {
+            sceneData[s.x0E8_SceneSnoId] = std::make_shared<SceneData>(s);
+        }
     }
 
     uint sno_id = Pointer<uint>()(Addr_LocalData+0x08);
 
-    SceneDataPtr current = std::make_shared<SceneData>();
-    current->fetchCurrent(sno_id);
-    if (current->good) {
-        sceneData.insert(current);
+    if (sceneData.find(sno_id) == sceneData.end()) {
+        SceneDataPtr current = std::make_shared<SceneData>();
+        current->fetchCurrent(sno_id);
+        if (current->good) {
+            sceneData[sno_id] = current;
+        }
     }
 
     cleared = false;
