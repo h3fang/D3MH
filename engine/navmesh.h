@@ -15,7 +15,6 @@ class SceneSnoData
 public:
     uint sno_id;
     std::vector<NavCell> cells;
-    bool cached;
 
 public:
     SceneSnoData();
@@ -38,16 +37,13 @@ public:
     uint levelArea_sno_id;
     Vec3 min;
     Vec3 max;
-    SceneSnoDataPtr sceneSnoDataPtr;
-    bool good;
 
 public:
     SceneData();
     SceneData(const Scene &s);
 
-    void fetchCurrent(uint sno_id);
     void fromScene(const Scene &s);
-    bool findSceneSnoData();
+    SceneSnoDataPtr findSceneSnoData();
 };
 
 typedef std::shared_ptr<SceneData> SceneDataPtr;
@@ -69,7 +65,6 @@ public:
     void fetchSceneSno();
 
 private:
-    bool cleared;
     uint last_level_area_sno_id;
 };
 

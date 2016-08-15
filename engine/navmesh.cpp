@@ -19,20 +19,18 @@ namespace D3 {
 std::unordered_map<uint, SceneSnoDataPtr> NavMesh::snoSceneIdAddrMap;
 
 SceneSnoData::SceneSnoData() :
-    sno_id(INVALID_SNO_ID),
-    cached(false)
+    sno_id(INVALID_SNO_ID)
 {
 }
 
 SceneSnoData::SceneSnoData(uint sno_id) :
     sno_id(INVALID_SNO_ID)
 {
-    cached = load(sno_id);
+    load(sno_id);
 }
 
 SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
-    sno_id(INVALID_SNO_ID),
-    cached(false)
+    sno_id(INVALID_SNO_ID)
 {
     AssetScene s = Pointer<AssetScene>()(sno_ptr);
 
@@ -74,8 +72,7 @@ bool SceneSnoData::save()
         file.write((char *)&c, sizeof(c));
     }
 
-    cached = file.good();
-    return cached;
+    return file.good();
 }
 
 bool SceneSnoData::load(uint sno_id)
@@ -102,7 +99,6 @@ bool SceneSnoData::load(uint sno_id)
         }
     }
 
-    cached = true;
     this->sno_id = sno_id;
     return true;
 }
@@ -112,23 +108,13 @@ SceneData::SceneData() :
     sno_id(INVALID_SNO_ID),
     levelArea_sno_id(INVALID_SNO_ID),
     min(Vec3{0, 0, 0}),
-    max(Vec3{0, 0, 0}),
-    good(false)
+    max(Vec3{0, 0, 0})
 {
 }
 
 SceneData::SceneData(const Scene &s)
 {
     fromScene(s);
-}
-
-void SceneData::fetchCurrent(uint sno_id)
-{
-    this->sno_id = sno_id;
-    // NOTE:offset
-    levelArea_sno_id = Pointer<int>()(Addr_LevelArea, offsetof(LevelArea, x044_SnoId));
-
-    good = findSceneSnoData();
 }
 
 void SceneData::fromScene(const Scene &s)
@@ -144,24 +130,21 @@ void SceneData::fromScene(const Scene &s)
     max.x = s.x174_MeshMaxX;
     max.y = s.x178_MeshMaxY;
     max.z = s.x104_MeshMinZ; //there is no max z, so consider all grid cells flat
-
-    good = findSceneSnoData();
 }
 
-bool SceneData::findSceneSnoData()
+SceneSnoDataPtr SceneData::findSceneSnoData()
 {
     if (NavMesh::snoSceneIdAddrMap.find(sno_id) == NavMesh::snoSceneIdAddrMap.end()) {
         qDebug("No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap", sno_id);
-        return false;
+        return SceneSnoDataPtr();
     }
     else {
-        sceneSnoDataPtr = NavMesh::snoSceneIdAddrMap[sno_id];
-        return true;
+        return NavMesh::snoSceneIdAddrMap[sno_id];
     }
 }
 
 NavMesh::NavMesh() :
-    cleared(true)
+    last_level_area_sno_id(INVALID_SNO_ID)
 {
     loadSceneSnoFiles();
 }
@@ -182,7 +165,7 @@ void NavMesh::loadSceneSnoFiles()
         uint sno_id = s.toUInt(&ok);
         if (ok) {
             SceneSnoDataPtr ss = std::make_shared<SceneSnoData>(sno_id);
-            if (ss->cached) {
+            if (!ss->cells.empty()) {
                 snoSceneIdAddrMap[sno_id] = ss;
             }
         }
@@ -199,10 +182,7 @@ void NavMesh::update()
 
 void NavMesh::clear()
 {
-    if (!cleared) {
-        sceneData.clear();
-        cleared = true;
-    }
+    sceneData.clear();
 }
 
 void NavMesh::fetchScene()
@@ -219,27 +199,12 @@ void NavMesh::fetchScene()
     Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager, offsetof(ObjectManager, x998_Scenes), 0);
 
     for (const auto& s : enumerate_container(c)) {
-        if (s.x000_Id == INVALID_SNO_ID || s.x018_LevelAreaSnoId != last_level_area_sno_id) {
+        if (s.x000_Id == INVALID_SNO_ID) {
             continue;
         }
 
-        if (sceneData.find(s.x0E8_SceneSnoId) == sceneData.end()) {
-            sceneData[s.x0E8_SceneSnoId] = std::make_shared<SceneData>(s);
-        }
+        sceneData[s.x004_NavMeshId] = std::make_shared<SceneData>(s);
     }
-
-    // NOTE:offset
-    uint sno_id = Pointer<uint>()(Addr_LocalData+0x08);
-
-    if (sceneData.find(sno_id) == sceneData.end()) {
-        SceneDataPtr current = std::make_shared<SceneData>();
-        current->fetchCurrent(sno_id);
-        if (current->good) {
-            sceneData[sno_id] = current;
-        }
-    }
-
-    cleared = false;
 }
 
 void NavMesh::fetchSceneSno()

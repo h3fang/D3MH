@@ -137,7 +137,7 @@ bool getSerializedData(std::vector<T> &out, DataPtr2 ptr, uint dwBase)
     //Real data start
     uint dwDataStart = dwBase + ptr.file_offset;
 
-    if (ptr.size <= 0 || ptr.size > 100000) {
+    if (ptr.size == 0) {
         fprintf(stderr, "NavMesh::getSerializedRecords() ptr.file_offset %d , ptr.size %d\n", ptr.file_offset, ptr.size);
         return false;
     }

@@ -97,11 +97,6 @@ bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *
 
 void Minimap::drawInfo(QPainter *p)
 {
-    // draw background
-//    p->setPen(Qt::NoPen);
-//    p->setBrush(QColor(250, 150, 150, 128));
-//    p->drawRect(0, 0, width(),  height());
-
     p->setPen(QColor(0, 250, 0, 128));
     p->setFont(QFont("Arial", 16));
 
@@ -139,11 +134,12 @@ void Minimap::drawMinimap(QPainter *p)
         D3::SceneDataPtr s = pair.second;
         scene_grids.push_back(QRectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
 
-        if (!s->sceneSnoDataPtr) {
-            break;
+        auto ss = s->findSceneSnoData();
+        if (!ss) {
+            continue;
         }
 
-        for (const D3::NavCell &c: s->sceneSnoDataPtr->cells) {
+        for (const D3::NavCell &c: ss->cells) {
             QRectF r_cell(c.min.x+s->min.x, c.min.y+s->min.y, c.max.x-c.min.x, c.max.y-c.min.y);
             scene_cells.push_back(r_cell);
         }

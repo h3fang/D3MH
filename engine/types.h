@@ -8,6 +8,7 @@ namespace D3 {
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
+
 struct Vec2
 {
     float x;     // 0x000
