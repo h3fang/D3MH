@@ -2,12 +2,14 @@
 #define D3MH_STRUCTS
 
 #include "actor.h"
+#include "actorcommondata.h"
 #include "localdata.h"
+#include "levelarea.h"
+#include "marker.h"
 #include "objectmanager.h"
 #include "scene.h"
 #include "sno.h"
 #include "navmesh.h"
-#include "levelarea.h"
 
 #endif // D3MH_STRUCTS
 

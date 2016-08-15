@@ -6,9 +6,11 @@
 #include <utils/precisetimer.h>
 
 #include "structs.h"
+#include "process/memoryreader.h"
 
-class MemoryReader;
+namespace D3 {
 
+// NOTE:offset
 enum Addr
 {
 //    Addr_SnoGroupInitializers = 0x01C36944 - 4,
@@ -52,6 +54,7 @@ public:
     void update();
 
     bool isInGame();
+    void enumerateACD();
 
 private:
     Engine();
@@ -61,5 +64,96 @@ private:
     MemoryReader *memoryReader;
     PreciseTimer nav_mesh_timer;
 };
+
+template<class T>
+std::vector<T> enumerate_container(const Container<T>& c)
+{
+    std::vector<T> r;
+
+    if (short(c.x108_MaxIndex) < 0 || c.x11C_PtrItems == 0) {
+        return r;
+    }
+
+    if (sizeof(T) != c.x104_ItemSize) {
+        fprintf(stderr, "sizeof(T) and c.x104_ItemSize doesn't match in enumerate_container()\n");
+        return r;
+    }
+
+    r.resize(short(c.x108_MaxIndex));
+
+    if (!MemoryReader::instance()->read(r.data(), (void*)c.x11C_PtrItems, c.x104_ItemSize * short(c.x108_MaxIndex))) {
+        fprintf(stderr, "Failed to read memory in enumerate_container()\n");
+        r.clear();
+    }
+
+    return r;
+}
+
+template<class T>
+std::vector<T> enumerate_expandable_container(const ExpandableContainer<T>& c)
+{
+    std::vector<T> r;
+
+    if (short(c.x108_MaxIndex) < 0) {
+        return r;
+    }
+
+    if (sizeof(T) != c.x104_ItemSize) {
+        fprintf(stderr, "sizeof(T) and c.x104_ItemSize doesn't match in enumerate_container()\n");
+        return r;
+    }
+
+    int blockSize = 1 << c.x164_Bits;
+    int blockCount = (short(c.x108_MaxIndex) / blockSize) + 1;
+
+    uint blockPointers[blockCount];
+
+    MemoryReader* mr = MemoryReader::instance();
+
+    if (!mr->read(r.data(), (void*)c.x120_Allocation, sizeof(blockPointers))) {
+        fprintf(stderr, "Failed to read memory in enumerate_expandable_container()\n");
+        return r;
+    }
+
+    r.resize(short(c.x108_MaxIndex));
+
+    for (int i = 0; i <= short(c.x108_MaxIndex); i++)
+    {
+        uint itemAddress = blockPointers[i / blockSize] + c.x104_ItemSize * (i % blockSize);
+
+        if (!mr->read(&(r[i]), (void*)itemAddress, c.x104_ItemSize)) {
+            fprintf(stderr, "Failed to read memory in enumerate_expandable_container()\n");
+            r.clear();
+            return r;
+        }
+    }
+
+    return r;
+}
+
+template<class T>
+bool getSerializedData(std::vector<T> &out, DataPtr2 ptr, uint dwBase)
+{
+    //Real data start
+    uint dwDataStart = dwBase + ptr.file_offset;
+
+    if (ptr.size <= 0 || ptr.size > 100000) {
+        fprintf(stderr, "NavMesh::getSerializedRecords() ptr.file_offset %d , ptr.size %d\n", ptr.file_offset, ptr.size);
+        return false;
+    }
+
+    out.resize(ptr.size/sizeof(T)+1);
+
+    //Read records
+    if (!MemoryReader::instance()->read(out.data(), (void*)dwDataStart, ptr.size)) {
+        fprintf(stderr, "Failed to read memory in NavMesh::getSerializedRecords() ptr.file_offset %d , ptr.size %d\n", ptr.file_offset, ptr.size);
+        out.clear();
+        return false;
+    }
+
+    return true;
+}
+
+}
 
 #endif // D3MH_ENGINE_H

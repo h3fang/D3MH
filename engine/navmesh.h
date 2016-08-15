@@ -5,7 +5,6 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
-#include <set>
 
 #include "structs.h"
 
@@ -53,36 +52,21 @@ public:
 
 typedef std::shared_ptr<SceneData> SceneDataPtr;
 
-bool operator < (const Vec3& lhs, const Vec3& rhs);
-
 class NavMesh
 {
 public:
-    struct SceneDatacomp {
-        bool operator() (const SceneDataPtr& lhs, const SceneDataPtr& rhs) const {
-            if (lhs->sno_id == rhs->sno_id) {
-                return lhs->min < rhs->min;
-            }
-            else {
-                return lhs->sno_id < rhs->sno_id;
-            }
-        }
-    };
-
     static std::unordered_map<uint, SceneSnoDataPtr> snoSceneIdAddrMap;
     std::unordered_map<uint, SceneDataPtr> sceneData;
 
 public:
     NavMesh();
+    ~NavMesh();
 
     void loadSceneSnoFiles();
     void update();
     void clear();
     void fetchScene();
     void fetchSceneSno();
-
-    template<class T>
-    static bool getSerializedRecords(std::vector<T> &out, DataPtr2 ptr, uint dwBase = 0);
 
 private:
     bool cleared;

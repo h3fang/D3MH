@@ -5,7 +5,7 @@
 
 #include <windows.h>
 
-class Engine;
+#include "engine/engine.h"
 
 class Minimap : public QWidget
 {
@@ -33,7 +33,7 @@ private:
 
 private:
     QTransform minimapTransform;
-    Engine *engine;
+    D3::Engine *engine;
     HWND d3Window;
     bool draw_minimap;
     bool size_changed;

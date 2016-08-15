@@ -38,10 +38,16 @@ SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
 
     sno_id = s.header.x00_SnoId;
 
-    NavMesh::getSerializedRecords(cells, s.NavZone.NavCells, (uint)sno_ptr);
+    if (s.NavZone.NavCellCount <= 0 || s.NavZone.NavCells.size != sizeof(NavCell)*s.NavZone.NavCellCount) {
+        return;
+    }
+
+    getSerializedData(cells, s.NavZone.NavCells, (uint)sno_ptr);
+
+//    qDebug("Sno Id [%u] lockcount %d flags %d cell count %d\n", sno_id, s.header.x04_LockCount, s.header.x08_Flags, s.NavZone.NavCellCount);
 
     if (cells.empty()) {
-        qDebug("Got 0 serialized records for Sno Id [%u]\n", sno_id);
+        qDebug("Got 0 serialized records for Sno Id [%u] lockcount %d flags %d cell count %d\n", sno_id, s.header.x04_LockCount, s.header.x08_Flags, s.NavZone.NavCellCount);
     }
     else {
         cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
@@ -52,9 +58,6 @@ SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
 
 SceneSnoData::~SceneSnoData()
 {
-    if (!cached) {
-        save();
-    }
 }
 
 bool SceneSnoData::save()
@@ -122,6 +125,7 @@ SceneData::SceneData(const Scene &s)
 void SceneData::fetchCurrent(uint sno_id)
 {
     this->sno_id = sno_id;
+    // NOTE:offset
     levelArea_sno_id = Pointer<int>()(Addr_LevelArea, offsetof(LevelArea, x044_SnoId));
 
     good = findSceneSnoData();
@@ -147,7 +151,7 @@ void SceneData::fromScene(const Scene &s)
 bool SceneData::findSceneSnoData()
 {
     if (NavMesh::snoSceneIdAddrMap.find(sno_id) == NavMesh::snoSceneIdAddrMap.end()) {
-        qDebug("No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap\n", sno_id);
+        qDebug("No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap", sno_id);
         return false;
     }
     else {
@@ -156,37 +160,17 @@ bool SceneData::findSceneSnoData()
     }
 }
 
-template<class T>
-bool NavMesh::getSerializedRecords(std::vector<T> &out, DataPtr2 ptr, uint dwBase)
-{
-    //Real data start
-    uint dwDataStart = dwBase + ptr.file_offset;
-
-    out.reserve(ptr.size/sizeof(T)+1);
-
-    //Read records
-    while ( dwDataStart < (dwBase + ptr.file_offset + ptr.size) )
-    {
-        T data;
-
-        if (!MemoryReader::instance()->read(&data, (void*)dwDataStart, sizeof(T))) {
-            qDebug("Failed to read memory in NavMesh::getSerializedRecords()\n");
-//            out.clear();
-            return false;
-        }
-
-        out.push_back(data);
-
-        dwDataStart += sizeof(T);
-    }
-
-    return true;
-}
-
 NavMesh::NavMesh() :
     cleared(true)
 {
     loadSceneSnoFiles();
+}
+
+NavMesh::~NavMesh()
+{
+    for (const auto& pair : snoSceneIdAddrMap) {
+        pair.second->save();
+    }
 }
 
 void NavMesh::loadSceneSnoFiles()
@@ -223,22 +207,18 @@ void NavMesh::clear()
 
 void NavMesh::fetchScene()
 {
-    uint level_area_sno_id = Pointer<uint>()(Addr_LevelArea, 0x44);
+    // NOTE:offset
+    uint level_area_sno_id = Pointer<uint>()(Addr_LevelArea, offsetof(LevelArea, x044_SnoId));
 
     if(level_area_sno_id != last_level_area_sno_id){
         last_level_area_sno_id = level_area_sno_id;
         clear();
     }
 
-    Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager,offsetof(ObjectManager, x998_Scenes), 0);
+    // NOTE:offset
+    Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager, offsetof(ObjectManager, x998_Scenes), 0);
 
-    if (c.x108_MaxIndex < 0 || c.x11C_PtrItems == 0) {
-        return;
-    }
-
-    for (int i = 0; i < c.x108_MaxIndex; ++i) {
-        Scene s = Pointer<Scene>()(c.x11C_PtrItems+i*c.x104_ItemSize);
-
+    for (const auto& s : enumerate_container(c)) {
         if (s.x000_Id == INVALID_SNO_ID || s.x018_LevelAreaSnoId != last_level_area_sno_id) {
             continue;
         }
@@ -248,6 +228,7 @@ void NavMesh::fetchScene()
         }
     }
 
+    // NOTE:offset
     uint sno_id = Pointer<uint>()(Addr_LocalData+0x08);
 
     if (sceneData.find(sno_id) == sceneData.end()) {
@@ -263,41 +244,18 @@ void NavMesh::fetchScene()
 
 void NavMesh::fetchSceneSno()
 {
+    // NOTE:offset
     Container<SnoDefinition> c = Pointer<Container<SnoDefinition>>()(Addr_SnoGroupByCode+sizeof(void*)*(int)(SnoGroupId_Scene),
                                                                      offsetof(SnoGroupManager, x10_Container),
                                                                      0);
 
-    if (c.x108_MaxIndex < 0 || c.x11C_PtrItems == 0) {
-        return;
-    }
-
-    for (int i = 0; i < c.x108_MaxIndex; ++i) {
-        SnoDefinition d = Pointer<SnoDefinition>()(c.x11C_PtrItems+i*c.x104_ItemSize);
+    for (const auto & d : enumerate_container(c)) {
         if(d.x00_Id == INVALID_SNO_ID || d.x07_SnoGroupId != (char)SnoGroupId_Scene){
             continue;
         }
 
         SceneSnoDataPtr s = std::make_shared<SceneSnoData>((AssetScene *)d.x0C_pSNOAddr);
         snoSceneIdAddrMap[s->sno_id] = s;
-    }
-}
-
-bool operator <(const Vec3 &lhs, const Vec3 &rhs) {
-    if (std::fabs(lhs.x - rhs.x) < 0.0001) {
-        if (std::fabs(lhs.y - rhs.y) < 0.0001) {
-            if (std::fabs(lhs.z - rhs.z) < 0.0001) {
-                return false;
-            }
-            else {
-                return lhs.z < rhs.z;
-            }
-        }
-        else {
-            return lhs.y < rhs.y;
-        }
-    }
-    else {
-        return lhs.x < rhs.x;
     }
 }
 

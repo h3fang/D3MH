@@ -40,8 +40,9 @@ HEADERS  += minimap.h \
     process/pointer.h \
     engine/levelarea.h \
     engine/marker.h \
-    engine/ui.h
+    engine/ui.h \
+    engine/actorcommondata.h
 
 RC_FILE = default.rc
 
-QMAKE_CXXFLAGS_RELEASE += -DQT_NO_DEBUG_OUTPUT -msse2 -mfpmath=sse
+QMAKE_CXXFLAGS_RELEASE += -msse2 -mfpmath=sse #-DQT_NO_DEBUG_OUTPUT

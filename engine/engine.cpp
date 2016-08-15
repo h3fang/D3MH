@@ -1,6 +1,10 @@
 #include "engine.h"
 
-#include "process/memoryreader.h"
+#include <fstream>
+
+#include "process/pointer.h"
+
+namespace D3 {
 
 Engine::~Engine()
 {
@@ -34,9 +38,20 @@ bool Engine::isInGame()
     return localData.x04_IsNotInGame != 0xCD && localData.x00_IsActorCreated == 1;
 }
 
+void Engine::enumerateACD()
+{
+    // NOTE:offset
+    ExpandableContainer<ActorCommonData> c = Pointer<ExpandableContainer<ActorCommonData>>()(Addr_ObjectManager + 0x798 + 0x158, 0, 0);
+    for (const auto& acd : enumerate_expandable_container(c)) {
+
+    }
+}
+
 Engine::Engine():
     navMesh(new D3::NavMesh),
     memoryReader(MemoryReader::instance())
 {
+}
+
 }
 

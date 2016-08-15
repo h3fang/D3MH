@@ -8,9 +8,9 @@ namespace D3 {
 struct Actor{ // sizeof = 0x454
     uint x000_Id;
     char x004_Name[0x80];
-    int x084_SceneId;
-    int x088_AcdId;
-    int x08C_ActorSnoId;
+    uint x084_SceneId;
+    uint x088_AcdId;
+    uint x08C_ActorSnoId;
     int x090_StructStart_Min80Bytes_ActorLocation;
     float x094_StructStart_Min28Bytes;
     float x098;
@@ -31,8 +31,8 @@ struct Actor{ // sizeof = 0x454
     float x0D4_BottomRadius;
     int _x0D8;
     int _x0DC;
-    int x0E0_WorldId;
-    int x0E4_SceneNavMeshId;
+    uint x0E0_WorldId;
+    uint x0E4_SceneNavMeshId;
     int _x0E8;
     int _x0EC;
     int _x0F0;
@@ -61,7 +61,7 @@ struct Actor{ // sizeof = 0x454
     int _x14C;
     int _x150;
     int _x154;
-    int x158_AppearanceSnoId;
+    uint x158_AppearanceSnoId;
     int _x15C;
     int _x160;
     int _x164;
