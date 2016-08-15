@@ -89,14 +89,17 @@ bool SceneSnoData::load(uint sno_id)
 
     cells.reserve(size);
 
+    NavCell c;
+
     for (int i=0; i<size; ++i) {
-        NavCell c;
         file.read((char *)&c, sizeof(c));
 
         if (file.fail() || file.bad()) {
             cells.clear();
             return false;
         }
+
+        cells.push_back(c);
     }
 
     this->sno_id = sno_id;
