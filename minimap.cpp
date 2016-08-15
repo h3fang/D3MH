@@ -15,7 +15,7 @@ float CANVAS_WIDTH = 1500.0f;
 const float CANVAS_HEIGHT = 1200.0f;
 
 Minimap::Minimap(QWidget *parent) :
-    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint | Qt::Tool),
+    QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint),
     d3Window(NULL),
     draw_minimap(false),
     size_changed(false),
