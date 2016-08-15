@@ -202,7 +202,7 @@ void NavMesh::fetchScene()
     Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager, offsetof(ObjectManager, x998_Scenes), 0);
 
     for (const auto& s : enumerate_container(c)) {
-        if (s.x000_Id == INVALID_SNO_ID || s.x004_NavMeshId == INVALID_SNO_ID) {
+        if (s.x000_Id == INVALID_SNO_ID) {
             continue;
         }
 

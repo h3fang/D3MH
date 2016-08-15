@@ -35,11 +35,11 @@ Minimap::Minimap(QWidget *parent) :
 
     showMaximized();
 
-    QTimer *t = new QTimer(this);
+    QTimer *t = new QTimer(this); t->setTimerType(Qt::PreciseTimer);
     connect(t, SIGNAL(timeout()), this, SLOT(update()));
     t->start(50);
 
-    t = new QTimer(this);
+    t = new QTimer(this); t->setTimerType(Qt::PreciseTimer);
     connect(t, SIGNAL(timeout()), this, SLOT(repositionWindow()));
     t->start(500);
 }
@@ -152,6 +152,13 @@ void Minimap::drawMinimap(QPainter *p)
     p->setPen(Qt::transparent);
     p->setBrush(QColor(0, 255, 0, 64));
     p->drawRects(scene_cells);
+
+    p->setBrush(QColor(255, 0, 0, 196));
+    for (const D3::ActorCommonData& acd : engine->acds) {
+        if (acd.x184_ActorType == D3::ActorType_Monster) {
+            p->drawEllipse(QPointF(acd.x0D0_WorldPosX, acd.x0D4_WorldPosY), 5, 5);
+        }
+    }
 
     p->restore();
 

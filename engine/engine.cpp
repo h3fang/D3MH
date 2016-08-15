@@ -22,6 +22,8 @@ void Engine::update()
     memoryReader->read(&localData, (void *)Addr_LocalData, sizeof(D3::LocalData));
     memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int));
 
+    update_acds();
+
     if (isInGame()) {
         if (nav_mesh_timer.start_or_elapsed() > 0.3) {
             navMesh->update();
@@ -38,13 +40,11 @@ bool Engine::isInGame()
     return localData.x04_IsNotInGame != 0xCD && localData.x00_IsActorCreated == 1;
 }
 
-void Engine::enumerateACD()
+void Engine::update_acds()
 {
     // NOTE:offset
-    ExpandableContainer<ActorCommonData> c = Pointer<ExpandableContainer<ActorCommonData>>()(Addr_ObjectManager + 0x798 + 0x158, 0, 0);
-    for (const auto& acd : enumerate_expandable_container(c)) {
-
-    }
+    ExpandableContainer<ActorCommonData> c = Pointer<ExpandableContainer<ActorCommonData>>()(Addr_ObjectManager, 0x798 + 0x158, 0, 0);
+    acds = enumerate_expandable_container(c);
 }
 
 Engine::Engine():

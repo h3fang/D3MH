@@ -37,7 +37,10 @@ struct ActorCommonData{ // sizeof = 0x2F8
     int _x104;
     int x108_WorldId;
     int x10C_SceneId;
-    uchar x110[0x2F8-0x110];
+    uchar x110[0x180-0x110];
+    int x180_GizmoType;
+    int x184_ActorType;
+    uchar x188[0x2F8-0x188];
 };
 
 } // namespace D3
