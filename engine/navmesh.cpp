@@ -89,14 +89,17 @@ bool SceneSnoData::load(uint sno_id)
 
     cells.reserve(size);
 
+    NavCell c;
+
     for (int i=0; i<size; ++i) {
-        NavCell c;
         file.read((char *)&c, sizeof(c));
 
         if (file.fail() || file.bad()) {
             cells.clear();
             return false;
         }
+
+        cells.push_back(c);
     }
 
     this->sno_id = sno_id;
@@ -199,7 +202,7 @@ void NavMesh::fetchScene()
     Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager, offsetof(ObjectManager, x998_Scenes), 0);
 
     for (const auto& s : enumerate_container(c)) {
-        if (s.x000_Id == INVALID_SNO_ID) {
+        if (s.x000_Id == INVALID_SNO_ID || s.x004_NavMeshId == INVALID_SNO_ID) {
             continue;
         }
 
@@ -220,7 +223,9 @@ void NavMesh::fetchSceneSno()
         }
 
         SceneSnoDataPtr s = std::make_shared<SceneSnoData>((AssetScene *)d.x0C_pSNOAddr);
-        snoSceneIdAddrMap[s->sno_id] = s;
+        if (!s->cells.empty()) {
+            snoSceneIdAddrMap[s->sno_id] = s;
+        }
     }
 }
 
