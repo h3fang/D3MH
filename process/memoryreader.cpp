@@ -32,6 +32,17 @@ void MemoryReader::closeHandle()
     }
 }
 
+bool MemoryReader::checkHandle()
+{
+    if (process && WaitForSingleObject(process, 0) == WAIT_TIMEOUT) {
+        return true;
+    }
+    else {
+        closeHandle();
+        return false;
+    }
+}
+
 MemoryReader::~MemoryReader()
 {
     closeHandle();

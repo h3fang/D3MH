@@ -20,6 +20,10 @@ Engine *Engine::getInstance()
 
 void Engine::update()
 {
+    if (!memoryReader->checkHandle()) {
+        return;
+    }
+
     memoryReader->read(&localData, (void *)Addr_LocalData, sizeof(D3::LocalData));
     memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int));
 

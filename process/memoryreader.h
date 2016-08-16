@@ -14,6 +14,7 @@ public:
 
     DWORD getProcessId() const;
     void closeHandle();
+    bool checkHandle();
 
 private:
     MemoryReader(const wchar_t *name);
