@@ -8,6 +8,7 @@ namespace D3 {
 
 Engine::~Engine()
 {
+    memoryReader->closeHandle();
     delete navMesh;
 }
 

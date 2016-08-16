@@ -24,11 +24,17 @@ DWORD MemoryReader::getProcessId() const
     return process_id;
 }
 
-MemoryReader::~MemoryReader()
+void MemoryReader::closeHandle()
 {
     if(process){
         CloseHandle(process);
+        process = NULL;
     }
+}
+
+MemoryReader::~MemoryReader()
+{
+    closeHandle();
 }
 
 MemoryReader *MemoryReader::instance()
