@@ -19,18 +19,20 @@ namespace D3 {
 std::unordered_map<uint, SceneSnoDataPtr> NavMesh::snoSceneIdAddrMap;
 
 SceneSnoData::SceneSnoData() :
-    sno_id(INVALID_SNO_ID)
+    sno_id(INVALID_SNO_ID),
+    loaded(false)
 {
 }
 
 SceneSnoData::SceneSnoData(uint sno_id) :
     sno_id(INVALID_SNO_ID)
 {
-    load(sno_id);
+    loaded = load(sno_id);
 }
 
 SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
-    sno_id(INVALID_SNO_ID)
+    sno_id(INVALID_SNO_ID),
+    loaded(false)
 {
     AssetScene s = Pointer<AssetScene>()(sno_ptr);
 
@@ -146,7 +148,8 @@ SceneSnoDataPtr SceneData::findSceneSnoData()
     }
 }
 
-NavMesh::NavMesh() :
+NavMesh::NavMesh(Engine *e) :
+    engine(e),
     last_world_sno_id(INVALID_SNO_ID)
 {
     loadSceneSnoFiles();
@@ -155,7 +158,9 @@ NavMesh::NavMesh() :
 NavMesh::~NavMesh()
 {
     for (const auto& pair : snoSceneIdAddrMap) {
-        pair.second->save();
+        if (!pair.second->loaded) {
+            pair.second->save();
+        }
     }
 }
 
@@ -191,7 +196,7 @@ void NavMesh::clear()
 void NavMesh::fetchScene()
 {
     // NOTE:offset
-    uint world_sno_id = Engine::getInstance()->localData.x0C_WorldSnoId;
+    uint world_sno_id = engine->localData.x0C_WorldSnoId;
 
     if(world_sno_id != last_world_sno_id){
         last_world_sno_id = world_sno_id;

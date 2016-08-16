@@ -6,26 +6,24 @@
 
 namespace D3 {
 
-Engine::~Engine()
+Engine::Engine():
+    navMesh(new NavMesh(this))
 {
-    memoryReader->closeHandle();
-    delete navMesh;
 }
 
-Engine *Engine::getInstance()
+Engine::~Engine()
 {
-    static Engine instance;
-    return &instance;
+    delete navMesh;
 }
 
 void Engine::update()
 {
-    if (!memoryReader->checkHandle()) {
+    if (!MemoryReader::instance()->checkHandle()) {
         return;
     }
 
-    if (!memoryReader->read(&localData, (void *)Addr_LocalData, sizeof(LocalData))) { return; }
-    if (!memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int))) { return; }
+    if (!MemoryReader::instance()->read(&localData, (void *)Addr_LocalData, sizeof(LocalData))) { return; }
+    if (!MemoryReader::instance()->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int))) { return; }
 
     update_acds();
 
@@ -50,12 +48,6 @@ void Engine::update_acds()
     // NOTE:offset
     ExpandableContainer<ActorCommonData> c = Pointer<ExpandableContainer<ActorCommonData>>()(Addr_ObjectManager, 0x798 + 0x158, 0, 0);
     acds = enumerate_expandable_container(c);
-}
-
-Engine::Engine():
-    navMesh(new D3::NavMesh),
-    memoryReader(MemoryReader::instance())
-{
 }
 
 bool isTreasureGoblin(const ActorCommonData& acd)

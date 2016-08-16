@@ -16,6 +16,7 @@ const float CANVAS_HEIGHT = 1200.0f;
 
 Minimap::Minimap(QWidget *parent) :
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint),
+    engine(new D3::Engine()),
     d3Window(NULL),
     draw_minimap(false),
     size_changed(false),
@@ -30,7 +31,6 @@ Minimap::Minimap(QWidget *parent) :
     QDir dir(QCoreApplication::applicationDirPath());
     dir.mkdir("cache");
 
-    engine = D3::Engine::getInstance();
     registerHotKeys();
 
     showMaximized();
@@ -46,6 +46,8 @@ Minimap::Minimap(QWidget *parent) :
 
 Minimap::~Minimap()
 {
+    delete engine;
+
     if (d3Window) {
         CloseHandle(d3Window);
     }
@@ -66,7 +68,7 @@ void Minimap::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-//    drawInfo(&p);
+    drawInfo(&p);
     drawMinimap(&p);
 }
 
@@ -97,11 +99,11 @@ bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *
 
 void Minimap::drawInfo(QPainter *p)
 {
-    p->setPen(QColor(0, 250, 0, 128));
+    p->setPen(QColor(0, 255, 255, 128));
     p->setFont(QFont("Arial", 16));
 
     // NOTE:offset
-    p->drawText(QRectF(0, 0, 0.2*p->window().width(), 0.4*p->window().height()), Qt::AlignCenter,
+    p->drawText(QRectF(0, 0, 0.1*p->window().width(), 0.2*p->window().height()), Qt::AlignCenter,
                QString::asprintf("FrameCnt:%u\nAppLoopCnt:%u\nWorldSnoId:%u\nX:%.4f\nY:%.4f\nZ:%.4f\nSceneCnt:%u",
                                  Pointer<uint>()(D3::Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame)),
                                  engine->ApplicationLoopCount,
@@ -223,12 +225,11 @@ void Minimap::repositionWindow()
 
 QRect Minimap::getD3ClientRect()
 {
-    if (!d3Window) {
+    if (!d3Window && MemoryReader::instance()->getProcessId() != 0) {
         d3Window = FindMainWindow(MemoryReader::instance()->getProcessId());
     }
 
     if (!d3Window) {
-//        qDebug("Failed to find D3 window");
         return QRect();
     }
 

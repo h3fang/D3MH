@@ -19,17 +19,10 @@ MemoryReader::MemoryReader(const wchar_t *name):
         process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
     }
 }
+
 DWORD MemoryReader::getProcessId() const
 {
     return process_id;
-}
-
-void MemoryReader::closeHandle()
-{
-    if(process){
-        CloseHandle(process);
-        process = NULL;
-    }
 }
 
 bool MemoryReader::checkHandle()
@@ -38,14 +31,16 @@ bool MemoryReader::checkHandle()
         return true;
     }
     else {
-        closeHandle();
         return false;
     }
 }
 
 MemoryReader::~MemoryReader()
 {
-    closeHandle();
+    if(process){
+        CloseHandle(process);
+        process = NULL;
+    }
 }
 
 MemoryReader *MemoryReader::instance()

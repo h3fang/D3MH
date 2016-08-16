@@ -50,19 +50,18 @@ public:
     std::vector<ActorCommonData> acds;
 
 public:
+    Engine();
     ~Engine();
-    static Engine *getInstance();
+
     void update();
 
     bool isInGame();
     void update_acds();
 
 private:
-    Engine();
     Engine(Engine&) = delete;
     Engine& operator=(const Engine &) = delete;
 
-    MemoryReader *memoryReader;
     PreciseTimer nav_mesh_timer;
 };
 
@@ -116,9 +115,7 @@ std::vector<T> enumerate_expandable_container(const ExpandableContainer<T>& c)
 
     std::vector<uint> blockPointers(blockCount);
 
-    MemoryReader* mr = MemoryReader::instance();
-
-    if (!mr->read(blockPointers.data(), (void*)c.x120_Allocation, blockCount * sizeof(uint))) {
+    if (!MemoryReader::instance()->read(blockPointers.data(), (void*)c.x120_Allocation, blockCount * sizeof(uint))) {
         fprintf(stderr, "Failed to read memory in enumerate_expandable_container()\n");
         return r;
     }
@@ -134,7 +131,7 @@ std::vector<T> enumerate_expandable_container(const ExpandableContainer<T>& c)
             n = short(c.x108_MaxIndex) - i;
         }
 
-        if (!mr->read(&(r[i]), (void*)itemAddress, c.x104_ItemSize * n)) {
+        if (!MemoryReader::instance()->read(&(r[i]), (void*)itemAddress, c.x104_ItemSize * n)) {
             fprintf(stderr, "Failed to read memory in enumerate_expandable_container()\n");
             r.clear();
             return r;

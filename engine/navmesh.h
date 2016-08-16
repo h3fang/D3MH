@@ -15,6 +15,7 @@ class SceneSnoData
 public:
     uint sno_id;
     std::vector<NavCell> cells;
+    bool loaded;
 
 public:
     SceneSnoData();
@@ -48,6 +49,8 @@ public:
 
 typedef std::shared_ptr<SceneData> SceneDataPtr;
 
+class Engine;
+
 class NavMesh
 {
 public:
@@ -55,7 +58,7 @@ public:
     std::unordered_map<uint, SceneDataPtr> sceneData;
 
 public:
-    NavMesh();
+    NavMesh(Engine *e);
     ~NavMesh();
 
     void loadSceneSnoFiles();
@@ -65,6 +68,7 @@ public:
     void fetchSceneSno();
 
 private:
+    Engine* engine;
     uint last_world_sno_id;
 };
 

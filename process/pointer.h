@@ -8,8 +8,7 @@ class Pointer
 {
 public:
     Pointer() :
-        current_ptr(0)/*,
-        mem_reader(MemoryReader::instance())*/
+        current_ptr(0)
     {}
 
     template<class P>
@@ -17,7 +16,7 @@ public:
     {
         T result;
         memset(&result, 0, sizeof(T));
-        mem_reader->read(&result, (void*)(current_ptr+ptr), sizeof(T));
+        MemoryReader::instance()->read(&result, (void*)(current_ptr+ptr), sizeof(T));
         return result;
     }
 
@@ -25,16 +24,12 @@ public:
     T operator()(const P ptr, const Ptrs... ptrs)
     {
         current_ptr += ptr;
-        mem_reader->read(&current_ptr, (void*)current_ptr, sizeof(void*));
+        MemoryReader::instance()->read(&current_ptr, (void*)current_ptr, sizeof(void*));
         return this->operator ()(ptrs...);
     }
 
 private:
     unsigned long current_ptr;
-    static MemoryReader *mem_reader;
 };
-
-template<class T>
-MemoryReader* Pointer<T>::mem_reader = MemoryReader::instance();
 
 #endif // UTILITIES_POINTER_H

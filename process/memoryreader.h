@@ -8,12 +8,11 @@ class MemoryReader
 public:
     ~MemoryReader();
 
-    static MemoryReader *instance();
+    static MemoryReader* instance();
 
     bool read(void *buffer, void *src, unsigned int size);
 
     DWORD getProcessId() const;
-    void closeHandle();
     bool checkHandle();
 
 private:
