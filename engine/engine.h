@@ -47,6 +47,7 @@ public:
     D3::LocalData localData;
     unsigned int ApplicationLoopCount;
     D3::NavMesh *navMesh;
+    std::vector<ActorCommonData> acds;
 
 public:
     ~Engine();
@@ -54,7 +55,7 @@ public:
     void update();
 
     bool isInGame();
-    void enumerateACD();
+    void update_acds();
 
 private:
     Engine();
@@ -64,6 +65,8 @@ private:
     MemoryReader *memoryReader;
     PreciseTimer nav_mesh_timer;
 };
+
+bool isTreasureGoblin(const ActorCommonData& acd);
 
 template<class T>
 std::vector<T> enumerate_container(const Container<T>& c)
@@ -99,29 +102,39 @@ std::vector<T> enumerate_expandable_container(const ExpandableContainer<T>& c)
     }
 
     if (sizeof(T) != c.x104_ItemSize) {
-        fprintf(stderr, "sizeof(T) and c.x104_ItemSize doesn't match in enumerate_container()\n");
+        fprintf(stderr, "sizeof(T) %d and c.x104_ItemSize %d doesn't match in enumerate_expandable_container()\n",
+               sizeof(T), c.x104_ItemSize);
         return r;
     }
 
     int blockSize = 1 << c.x164_Bits;
-    int blockCount = (short(c.x108_MaxIndex) / blockSize) + 1;
+    int blockCount = short(c.x108_MaxIndex) / blockSize;
 
-    uint blockPointers[blockCount];
+    if (short(c.x108_MaxIndex) % blockSize != 0) {
+        blockCount += 1;
+    }
+
+    std::vector<uint> blockPointers(blockCount);
 
     MemoryReader* mr = MemoryReader::instance();
 
-    if (!mr->read(r.data(), (void*)c.x120_Allocation, sizeof(blockPointers))) {
+    if (!mr->read(blockPointers.data(), (void*)c.x120_Allocation, blockCount * sizeof(uint))) {
         fprintf(stderr, "Failed to read memory in enumerate_expandable_container()\n");
         return r;
     }
 
     r.resize(short(c.x108_MaxIndex));
 
-    for (int i = 0; i <= short(c.x108_MaxIndex); i++)
+    for (int i = 0; i <= short(c.x108_MaxIndex); i+=blockSize)
     {
         uint itemAddress = blockPointers[i / blockSize] + c.x104_ItemSize * (i % blockSize);
 
-        if (!mr->read(&(r[i]), (void*)itemAddress, c.x104_ItemSize)) {
+        int n = blockSize;
+        if ((i + blockSize) > short(c.x108_MaxIndex)) {
+            n = short(c.x108_MaxIndex) - i;
+        }
+
+        if (!mr->read(&(r[i]), (void*)itemAddress, c.x104_ItemSize * n)) {
             fprintf(stderr, "Failed to read memory in enumerate_expandable_container()\n");
             r.clear();
             return r;

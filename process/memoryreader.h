@@ -13,6 +13,8 @@ public:
     bool read(void *buffer, void *src, unsigned int size);
 
     DWORD getProcessId() const;
+    void closeHandle();
+    bool checkHandle();
 
 private:
     MemoryReader(const wchar_t *name);

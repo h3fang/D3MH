@@ -24,11 +24,28 @@ DWORD MemoryReader::getProcessId() const
     return process_id;
 }
 
-MemoryReader::~MemoryReader()
+void MemoryReader::closeHandle()
 {
     if(process){
         CloseHandle(process);
+        process = NULL;
     }
+}
+
+bool MemoryReader::checkHandle()
+{
+    if (process && WaitForSingleObject(process, 0) == WAIT_TIMEOUT) {
+        return true;
+    }
+    else {
+        closeHandle();
+        return false;
+    }
+}
+
+MemoryReader::~MemoryReader()
+{
+    closeHandle();
 }
 
 MemoryReader *MemoryReader::instance()
