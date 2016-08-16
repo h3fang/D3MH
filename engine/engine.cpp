@@ -7,7 +7,8 @@
 namespace D3 {
 
 Engine::Engine():
-    navMesh(new NavMesh(this))
+    navMesh(new NavMesh(this)),
+    last_frame(0)
 {
 }
 
@@ -16,31 +17,53 @@ Engine::~Engine()
     delete navMesh;
 }
 
-void Engine::update()
+bool Engine::update()
 {
     if (!MemoryReader::instance()->checkHandle()) {
-        return;
+        return false;
     }
 
-    if (!MemoryReader::instance()->read(&localData, (void *)Addr_LocalData, sizeof(LocalData))) { return; }
-    if (!MemoryReader::instance()->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int))) { return; }
-
-    update_acds();
+    if (!MemoryReader::instance()->read(&localData, (void *)Addr_LocalData, sizeof(LocalData))) { return false; }
+    if (!MemoryReader::instance()->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int))) { return false; }
 
     if (isInGame()) {
-        if (nav_mesh_timer.start_or_elapsed() > 0.3) {
-            navMesh->update();
-            nav_mesh_timer.start();
+        if (isObjectManagerOnNewFrame()) {
+            update_acds();
+
+            if (nav_mesh_timer.start_or_elapsed() > 0.3) {
+                navMesh->update();
+                nav_mesh_timer.start();
+            }
         }
     }
     else {
+        acds.clear();
         navMesh->clear();
     }
+
+    return true;
 }
 
 bool Engine::isInGame()
 {
     return localData.x04_IsNotInGame != 0xCD && localData.x00_IsActorCreated == 1;
+}
+
+bool Engine::isObjectManagerOnNewFrame()
+{
+    auto frame = Pointer<uint>()(D3::Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame));
+
+    if (frame > last_frame) {
+        last_frame = frame;
+        return true;
+    }
+    else if (frame < last_frame) {
+        last_frame = frame;
+        return false;
+    }
+    else {
+        return false;
+    }
 }
 
 void Engine::update_acds()

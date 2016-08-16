@@ -61,15 +61,13 @@ void Minimap::paintEvent(QPaintEvent *)
         return;
     }
 
-    if (engine) {
-        engine->update();
+    if (engine->update()) {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+
+        drawInfo(&p);
+        drawMinimap(&p);
     }
-
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    drawInfo(&p);
-    drawMinimap(&p);
 }
 
 void Minimap::resizeEvent(QResizeEvent *e)
@@ -99,8 +97,8 @@ bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *
 
 void Minimap::drawInfo(QPainter *p)
 {
-    p->setPen(QColor(0, 255, 255, 128));
-    p->setFont(QFont("Arial", 16));
+    p->setPen(QColor(255, 255, 0));
+    p->setFont(QFont("Arial", 12));
 
     // NOTE:offset
     p->drawText(QRectF(0, 0, 0.1*p->window().width(), 0.2*p->window().height()), Qt::AlignCenter,

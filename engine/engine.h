@@ -53,9 +53,10 @@ public:
     Engine();
     ~Engine();
 
-    void update();
+    bool update();
 
     bool isInGame();
+    bool isObjectManagerOnNewFrame();
     void update_acds();
 
 private:
@@ -63,6 +64,7 @@ private:
     Engine& operator=(const Engine &) = delete;
 
     PreciseTimer nav_mesh_timer;
+    uint last_frame;
 };
 
 bool isTreasureGoblin(const ActorCommonData& acd);
