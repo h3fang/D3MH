@@ -102,7 +102,7 @@ void Minimap::drawInfo(QPainter *p)
 
     // NOTE:offset
     p->drawText(QRectF(0, 0, 0.2*p->window().width(), 0.4*p->window().height()), Qt::AlignCenter,
-               QString::asprintf("FrameCnt:%u\nAppLoopCnt:%u\nWorldSnoId:%d\nX:%.4f\nY:%.4f\nZ:%.4f\nSceneCnt:%u",
+               QString::asprintf("FrameCnt:%u\nAppLoopCnt:%u\nWorldSnoId:%u\nX:%.4f\nY:%.4f\nZ:%.4f\nSceneCnt:%u",
                                  Pointer<uint>()(D3::Addr_ObjectManager, offsetof(D3::ObjectManager,x038_Counter_CurrentFrame)),
                                  engine->ApplicationLoopCount,
                                  engine->localData.x0C_WorldSnoId,

@@ -147,7 +147,7 @@ SceneSnoDataPtr SceneData::findSceneSnoData()
 }
 
 NavMesh::NavMesh() :
-    last_level_area_sno_id(INVALID_SNO_ID)
+    last_world_sno_id(INVALID_SNO_ID)
 {
     loadSceneSnoFiles();
 }
@@ -191,10 +191,10 @@ void NavMesh::clear()
 void NavMesh::fetchScene()
 {
     // NOTE:offset
-    uint level_area_sno_id = Pointer<uint>()(Addr_LevelArea, offsetof(LevelArea, x044_SnoId));
+    uint world_sno_id = Engine::getInstance()->localData.x0C_WorldSnoId;
 
-    if(level_area_sno_id != last_level_area_sno_id){
-        last_level_area_sno_id = level_area_sno_id;
+    if(world_sno_id != last_world_sno_id){
+        last_world_sno_id = world_sno_id;
         clear();
     }
 

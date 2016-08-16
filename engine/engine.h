@@ -44,9 +44,9 @@ enum Addr
 class Engine
 {
 public:
-    D3::LocalData localData;
+    LocalData localData;
     unsigned int ApplicationLoopCount;
-    D3::NavMesh *navMesh;
+    NavMesh *navMesh;
     std::vector<ActorCommonData> acds;
 
 public:

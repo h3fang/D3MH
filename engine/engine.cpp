@@ -24,8 +24,8 @@ void Engine::update()
         return;
     }
 
-    memoryReader->read(&localData, (void *)Addr_LocalData, sizeof(D3::LocalData));
-    memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int));
+    if (!memoryReader->read(&localData, (void *)Addr_LocalData, sizeof(LocalData))) { return; }
+    if (!memoryReader->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int))) { return; }
 
     update_acds();
 

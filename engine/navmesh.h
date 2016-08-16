@@ -65,7 +65,7 @@ public:
     void fetchSceneSno();
 
 private:
-    uint last_level_area_sno_id;
+    uint last_world_sno_id;
 };
 
 }
