@@ -16,7 +16,7 @@ struct LevelArea {
     int x00C_AnimationFrame;
     ListPack<SceneRevealInfo> x010_ListPack_Allocator_10x68Bytes_RevealedScenes;
     float x040_LabelOpacity;
-    int x044_SnoId;
+    uint x044_SnoId;
     int x048_LoadingSnoId;
     int x04C_LabelState; // 0 = Not visible, 1 = Partially visible, 2 = Fully visible
     int x050;

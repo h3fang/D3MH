@@ -7,6 +7,7 @@
 namespace D3 {
 
 Engine::Engine():
+    ApplicationLoopCount(0),
     navMesh(new NavMesh(this)),
     last_frame(0)
 {
@@ -23,8 +24,17 @@ bool Engine::update()
         return false;
     }
 
-    if (!MemoryReader::instance()->read(&localData, (void *)Addr_LocalData, sizeof(LocalData))) { return false; }
     if (!MemoryReader::instance()->read(&ApplicationLoopCount, (void *)Addr_ApplicationLoopCount, sizeof(int))) { return false; }
+
+    LocalData ld;
+    if (!MemoryReader::instance()->read(&ld, (void *)Addr_LocalData, sizeof(LocalData))) { return false; }
+
+    if (ld.x00_IsActorCreated > 1 || ld.x00_IsActorCreated < 0 || ld.x04_IsNotInGame > 1 || ld.x04_IsNotInGame < 0) {
+        return false;
+    }
+    else {
+        localData = ld;
+    }
 
     if (isInGame()) {
         if (isObjectManagerOnNewFrame()) {
