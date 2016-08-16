@@ -58,5 +58,20 @@ Engine::Engine():
 {
 }
 
+bool isTreasureGoblin(const ActorCommonData& acd)
+{
+    switch (acd.x098_MonsterSnoId) {
+    // TODO:update goblin IDs
+    case 0x00001760: // treasureGoblin_A
+    case 0x00001761: // treasureGoblin_B
+    case 0x00001763: // treasureGoblin_C
+    case 0x00001764: // treasureGoblin_D
+        return true;
+
+    default:
+        return false;
+    }
+}
+
 }
 

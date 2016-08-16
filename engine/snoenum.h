@@ -114,6 +114,17 @@ enum MonsterType
     MobType_Helper = 8
 };
 
+enum class MonsterQuality
+{
+    Normal = 0,
+    Champion = 1,
+    Rare = 2,
+    Minion = 3,
+    Unique = 4,
+    Hireling = 5,
+    Boss = 7
+};
+
 enum ItemLocation
 {
     ItemLoc_UnknownLoc = INVALID_SNO_ID, //  meaning NPC or item on the ground.

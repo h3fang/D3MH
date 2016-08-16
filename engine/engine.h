@@ -66,6 +66,8 @@ private:
     PreciseTimer nav_mesh_timer;
 };
 
+bool isTreasureGoblin(const ActorCommonData& acd);
+
 template<class T>
 std::vector<T> enumerate_container(const Container<T>& c)
 {

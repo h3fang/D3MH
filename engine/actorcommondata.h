@@ -11,9 +11,9 @@ struct ActorCommonData{ // sizeof = 0x2F8
     int x084_ChestRelated;
     uint x088_AnnId;
     uint x08C_ActorId;
-    int x090_ActorSnoId;
-    float x094_StructStart_Min8Bytes;
-    float x098_MonsterSnoId;
+    uint x090_ActorSnoId;
+    int x094_StructStart_Min8Bytes;
+    uint x098_MonsterSnoId;
     int x09C;
     int x0A0;
     int x0A4_GameTick;
@@ -35,12 +35,13 @@ struct ActorCommonData{ // sizeof = 0x2F8
     float x0FC_Height;
     float x100;
     int _x104;
-    int x108_WorldId;
-    int x10C_SceneId;
+    uint x108_WorldId;
+    uint x10C_SceneId;
     uchar x110[0x180-0x110];
     int x180_GizmoType;
     int x184_ActorType;
-    uchar x188[0x2F8-0x188];
+    float x188_Hitpoints;
+    uchar x18C[0x2F8-0x18C];
 };
 
 } // namespace D3

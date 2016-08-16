@@ -153,17 +153,49 @@ void Minimap::drawMinimap(QPainter *p)
     p->setBrush(QColor(0, 255, 0, 64));
     p->drawRects(scene_cells);
 
-    p->setBrush(QColor(255, 0, 0, 196));
+    int radius = 3;
     for (const D3::ActorCommonData& acd : engine->acds) {
-        if (acd.x184_ActorType == D3::ActorType_Monster) {
-            p->drawEllipse(QPointF(acd.x0D0_WorldPosX, acd.x0D4_WorldPosY), 5, 5);
+        if (acd.x184_ActorType == D3::ActorType_Monster &&
+                acd.x098_MonsterSnoId != D3::INVALID_SNO_ID &&
+                acd.x188_Hitpoints > 0) {
+            switch ((D3::MonsterQuality)acd.x0B8_MonsterQuality) {
+            case D3::MonsterQuality::Hireling : {
+                continue;
+            }
+            case D3::MonsterQuality::Normal :
+            case D3::MonsterQuality::Minion : {
+                if (D3::isTreasureGoblin(acd)) {
+                    radius = 5;
+                    p->setBrush(QColor(255, 255, 0, 196));
+                }
+                else {
+                    radius = 3;
+                    p->setBrush(QColor(255, 255, 255, 64));
+                }
+                break;
+            }
+            case D3::MonsterQuality::Champion :
+            case D3::MonsterQuality::Unique :
+            case D3::MonsterQuality::Rare : {
+                radius = 5;
+                p->setBrush(QColor(255, 0, 128, 196));
+                break;
+            }
+            case D3::MonsterQuality::Boss : {
+                radius = 6;
+                p->setBrush(QColor(255, 0, 0, 196));
+                break;
+            }
+            }
+
+            p->drawEllipse(QPointF(acd.x0D0_WorldPosX, acd.x0D4_WorldPosY), radius, radius);
         }
     }
 
     p->restore();
 
     // self
-    p->setBrush(QColor(255, 0, 0, 196));
+    p->setBrush(QColor(0, 0, 255, 196));
     p->drawEllipse(QPoint(0, 0), 7, 7);
 
     p->restore();
