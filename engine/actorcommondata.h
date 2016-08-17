@@ -41,7 +41,13 @@ struct ActorCommonData{ // sizeof = 0x2F8
     int x180_GizmoType;
     int x184_ActorType;
     float x188_Hitpoints;
-    uchar x18C[0x2F8-0x18C];
+    int x18C_TeamIdOverride;
+    int x190_TeamId;
+    int _x194;
+    int x198_Flags_Is_Trail_Proxy_Etc;
+    int x19C_FollowPlayerIndex; // 7 = None
+    int x1A0_Flags_1IsFollower_4HasHP;
+    uchar x1A4[0x2F8-0x1A4];
 };
 
 } // namespace D3
