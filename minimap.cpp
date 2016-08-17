@@ -168,10 +168,12 @@ void Minimap::drawMinimap(QPainter *p)
             case D3::MonsterQuality::Minion : {
                 if (D3::isTreasureGoblin(acd)) {
                     radius = 5;
+                    p->setPen(Qt::transparent);
                     p->setBrush(QColor(255, 255, 0, 196));
                 }
                 else {
                     radius = 3;
+                    p->setPen(Qt::transparent);
                     p->setBrush(QColor(255, 255, 255, 64));
                 }
                 break;
@@ -180,17 +182,25 @@ void Minimap::drawMinimap(QPainter *p)
             case D3::MonsterQuality::Unique :
             case D3::MonsterQuality::Rare : {
                 radius = 5;
+                p->setPen(Qt::transparent);
                 p->setBrush(QColor(255, 0, 128, 196));
                 break;
             }
             case D3::MonsterQuality::Boss : {
                 radius = 6;
+                p->setPen(Qt::transparent);
                 p->setBrush(QColor(255, 0, 0, 196));
                 break;
             }
             }
 
             p->drawEllipse(QPointF(acd.x0D0_WorldPosX, acd.x0D4_WorldPosY), radius, radius);
+        }
+
+        if (acd.x184_ActorType == D3::ActorType_Gizmo && D3::isShrine(acd)) {
+            p->setPen(QPen(QColor(255, 255, 0, 196), 3));
+            p->setBrush(Qt::transparent);
+            p->drawRect(QRectF(acd.x0D0_WorldPosX - 4, acd.x0D4_WorldPosY - 4, 8, 8));
         }
     }
 

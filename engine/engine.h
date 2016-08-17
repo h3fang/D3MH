@@ -68,6 +68,7 @@ private:
 };
 
 bool isTreasureGoblin(const ActorCommonData& acd);
+bool isShrine(const ActorCommonData& acd);
 
 template<class T>
 std::vector<T> enumerate_container(const Container<T>& c)
