@@ -85,7 +85,7 @@ void Engine::update_acds()
 
 bool isTreasureGoblin(const ActorCommonData& acd)
 {
-    switch (acd.x098_MonsterSnoId) {
+    switch (acd.x090_ActorSnoId) {
     // TODO:update goblin IDs
     case 0x00001760: // treasureGoblin_A
     case 0x00001761: // treasureGoblin_B
@@ -108,6 +108,7 @@ bool isTreasureGoblin(const ActorCommonData& acd)
 bool isShrine(const ActorCommonData& acd)
 {
     switch (acd.x090_ActorSnoId) {
+    // TODO:update shrine IDs
     case 0x00050BC7:
     case 0x00050BCA:
     case 0x00050BC8:
