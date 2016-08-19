@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     process/memoryreader.cpp \
     process/helper.cpp \
     engine/navmesh.cpp \
-    module/snocache.cpp
+    module/snocache.cpp \
+    module/helpers.cpp
 
 HEADERS  += minimap.h \
     engine/engine.h \
@@ -43,7 +44,8 @@ HEADERS  += minimap.h \
     engine/marker.h \
     engine/ui.h \
     engine/actorcommondata.h \
-    module/snocache.h
+    module/snocache.h \
+    module/helpers.h
 
 RC_FILE = default.rc
 

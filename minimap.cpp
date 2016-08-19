@@ -197,10 +197,17 @@ void Minimap::drawMinimap(QPainter *p)
             p->drawEllipse(QPointF(acd.x0D0_WorldPosX, acd.x0D4_WorldPosY), radius, radius);
         }
 
-        if (acd.x184_ActorType == D3::ActorType_Gizmo && D3::isShrine(acd)) {
-            p->setPen(QPen(QColor(255, 255, 0, 196), 3));
-            p->setBrush(Qt::transparent);
-            p->drawRect(QRectF(acd.x0D0_WorldPosX - 4, acd.x0D4_WorldPosY - 4, 8, 8));
+        if (acd.x184_ActorType == D3::ActorType_Gizmo) {
+            if (D3::isShrine(acd)) {
+                p->setPen(QPen(QColor(255, 255, 0, 196), 3));
+                p->setBrush(Qt::transparent);
+                p->drawRect(QRectF(acd.x0D0_WorldPosX - 4, acd.x0D4_WorldPosY - 4, 8, 8));
+            }
+            else if (D3::isPoolOfReflection(acd)) {
+                p->setPen(QPen(QColor(0, 0, 255, 196), 3));
+                p->setBrush(Qt::transparent);
+                p->drawRect(QRectF(acd.x0D0_WorldPosX - 4, acd.x0D4_WorldPosY - 4, 8, 8));
+            }
         }
     }
 
