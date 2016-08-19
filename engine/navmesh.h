@@ -20,7 +20,8 @@ public:
 public:
     SceneSnoData();
     SceneSnoData(uint sno_id);
-    SceneSnoData(AssetScene *sno_ptr);
+    SceneSnoData(SceneSno *sno_ptr);
+    SceneSnoData(SceneSnoFile *s);
 
     ~SceneSnoData();
 

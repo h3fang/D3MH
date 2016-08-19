@@ -30,15 +30,17 @@ SceneSnoData::SceneSnoData(uint sno_id) :
     loaded = load(sno_id);
 }
 
-SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
+SceneSnoData::SceneSnoData(SceneSno* sno_ptr) :
     sno_id(INVALID_SNO_ID),
     loaded(false)
 {
-    AssetScene s = Pointer<AssetScene>()(sno_ptr);
+    SceneSno s = Pointer<SceneSno>()(sno_ptr);
 
     sno_id = s.header.x00_SnoId;
 
-    if (s.NavZone.NavCellCount <= 0 || s.NavZone.NavCells.size != sizeof(NavCell)*s.NavZone.NavCellCount) {
+    if (s.NavZone.NavCellCount <= 0 ||
+            s.NavZone.NavCellCount > 1000 ||
+            s.NavZone.NavCells.size != sizeof(NavCell)*s.NavZone.NavCellCount) {
         return;
     }
 
@@ -48,6 +50,33 @@ SceneSnoData::SceneSnoData(AssetScene* sno_ptr) :
 
     if (cells.empty()) {
         qDebug("Got 0 serialized records for Sno Id [%u] lockcount %d flags %d cell count %d\n", sno_id, s.header.x04_LockCount, s.header.x08_Flags, s.NavZone.NavCellCount);
+    }
+    else {
+        cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
+            return (c.flag & NavCellFlagW_AllowWalk) == 0;
+        }), cells.end());
+    }
+}
+
+SceneSnoData::SceneSnoData(SceneSnoFile *s) :
+    sno_id(INVALID_SNO_ID),
+    loaded(false)
+{
+    sno_id = s->sceneSno.header.x00_SnoId;
+
+    if (s->sceneSno.NavZone.NavCellCount <= 0 ||
+            s->sceneSno.NavZone.NavCellCount > 1000 ||
+            s->sceneSno.NavZone.NavCells.size != sizeof(NavCell)*s->sceneSno.NavZone.NavCellCount) {
+        return;
+    }
+
+    getSerializedDataFromFile(cells, s->sceneSno.NavZone.NavCells, (uint)(&s->sceneSno));
+
+//    qDebug("Sno Id [%u] lockcount %d flags %d cell count %d\n", sno_id, s.header.x04_LockCount, s.header.x08_Flags, s.NavZone.NavCellCount);
+
+    if (cells.empty()) {
+        qDebug("Got 0 serialized records for Sno Id [%u] lockcount %d flags %d cell count %d\n",
+               sno_id, s->sceneSno.header.x04_LockCount, s->sceneSno.header.x08_Flags, s->sceneSno.NavZone.NavCellCount);
     }
     else {
         cells.erase(std::remove_if(cells.begin(), cells.end(), [](const NavCell& c){
@@ -180,6 +209,16 @@ void NavMesh::loadSceneSnoFiles()
     }
 
     qDebug("loaded %u SceneSno files", snoSceneIdAddrMap.size());
+
+    uint min = 0xFFFFFFFF, max = 0, total = 0;
+    for (const auto& p : snoSceneIdAddrMap) {
+        uint size = p.second->cells.size();
+        max = size > max ? size : max;
+        min = size < min ? size : min;
+        total += size;
+    }
+
+    qDebug("Scene Sno Files cell count, min: %d, max: %d, average: %f", min, max, total/float(snoSceneIdAddrMap.size()));
 }
 
 void NavMesh::update()
@@ -207,7 +246,10 @@ void NavMesh::fetchScene()
     Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager, offsetof(ObjectManager, x998_Scenes), 0);
 
     for (const auto& s : enumerate_container(c)) {
-        if (s.x000_Id == INVALID_SNO_ID) {
+        if (s.x000_Id == INVALID_SNO_ID ||
+                s.x0E8_SceneSnoId == INVALID_SNO_ID ||
+                s.x104_MeshMinZ < -100 ||
+                s.x104_MeshMinZ > 100) {
             continue;
         }
 
@@ -227,8 +269,8 @@ void NavMesh::fetchSceneSno()
             continue;
         }
 
-        SceneSnoDataPtr s = std::make_shared<SceneSnoData>((AssetScene *)d.x0C_pSNOAddr);
-        if (!s->cells.empty()) {
+        SceneSnoDataPtr s = std::make_shared<SceneSnoData>((SceneSno *)d.x0C_pSNOAddr);
+        if (!s->cells.empty()/* && snoSceneIdAddrMap.find(s->sno_id) == snoSceneIdAddrMap.end()*/) {
             snoSceneIdAddrMap[s->sno_id] = s;
         }
     }

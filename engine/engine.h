@@ -151,7 +151,8 @@ bool getSerializedData(std::vector<T> &out, DataPtr2 ptr, uint dwBase)
     uint dwDataStart = dwBase + ptr.file_offset;
 
     if (ptr.size == 0) {
-        fprintf(stderr, "NavMesh::getSerializedRecords() ptr.file_offset %d , ptr.size %d\n", ptr.file_offset, ptr.size);
+        fprintf(stderr, "getSerializedData() ptr.file_offset %d , ptr.size %d\n",
+                ptr.file_offset, ptr.size);
         return false;
     }
 
@@ -159,10 +160,31 @@ bool getSerializedData(std::vector<T> &out, DataPtr2 ptr, uint dwBase)
 
     //Read records
     if (!MemoryReader::instance()->read(out.data(), (void*)dwDataStart, ptr.size)) {
-        fprintf(stderr, "Failed to read memory in NavMesh::getSerializedRecords() ptr.file_offset %d , ptr.size %d\n", ptr.file_offset, ptr.size);
+        fprintf(stderr, "Failed to read memory in getSerializedData() ptr.file_offset %d , ptr.size %d\n",
+                ptr.file_offset, ptr.size);
         out.clear();
         return false;
     }
+
+    return true;
+}
+
+template<class T>
+bool getSerializedDataFromFile(std::vector<T> &out, DataPtr2 ptr, uint dwBase)
+{
+    //Real data start
+    uint dwDataStart = dwBase + ptr.file_offset;
+
+    if (ptr.size == 0) {
+        fprintf(stderr, "getSerializedDataFromFile() ptr.file_offset %d , ptr.size %d\n",
+                ptr.file_offset, ptr.size);
+        return false;
+    }
+
+    out.resize(ptr.size/sizeof(T)+1);
+
+    //Read records
+    memcpy(out.data(), (void*)dwDataStart, ptr.size);
 
     return true;
 }

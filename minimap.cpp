@@ -156,8 +156,8 @@ void Minimap::drawMinimap(QPainter *p)
     int radius = 3;
     for (const D3::ActorCommonData& acd : engine->acds) {
         if (acd.x184_ActorType == D3::ActorType_Monster &&
-                acd.x098_MonsterSnoId != D3::INVALID_SNO_ID &&
-                acd.x188_Hitpoints > 0 &&
+                acd.x090_ActorSnoId != D3::INVALID_SNO_ID &&
+                acd.x188_Hitpoints > 0.1 &&
                 (acd.x198_Flags_Is_Trail_Proxy_Etc & 1) == 0 &&
                 acd.x190_TeamId == 10) {
             switch ((D3::MonsterQuality)acd.x0B8_MonsterQuality) {

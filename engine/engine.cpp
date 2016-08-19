@@ -3,14 +3,17 @@
 #include <fstream>
 
 #include "process/pointer.h"
+#include "module/snocache.h"
 
 namespace D3 {
 
 Engine::Engine():
     ApplicationLoopCount(0),
-    navMesh(new NavMesh(this)),
     last_frame(0)
 {
+//    SnoCache sc("..\\Base\\Scene\\");
+//    sc.build();
+    navMesh = new NavMesh(this);
 }
 
 Engine::~Engine()

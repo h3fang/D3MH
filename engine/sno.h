@@ -10,18 +10,18 @@ namespace D3 {
 class SNOHeader
 {
 public:
-    uint x00_SnoId;		// 0x000
+    uint x00_SnoId;         // 0x000
     int x04_LockCount;      // 0x004
     int x08_Flags;          // 0x008, 1 = DoNotPurge
 };
 
 //sizeof = 0x10
-class SNOFileHeader
+struct SNOFileHeader
 {
-    uint deadbeef;			// 0x000
-    uint Reserved0;		// 0x004
-    uint Reserved1;		// 0x008
-    uint Reserved2;		// 0x010
+    uint deadbeef;          // 0x000 0xDEADBEEF
+    uint Reserved0;         // 0x004
+    uint Reserved1;         // 0x008
+    uint Reserved2;         // 0x010
 };
 
 //sizeof = 0x10
@@ -116,7 +116,7 @@ public:
 };
 
 //sizeof = 0x210
-class AssetScene
+class SceneSno
 {
 public:
     SNOHeader header;			// 0x000
@@ -136,6 +136,13 @@ public:
     NavZoneDef NavZone;			// 0x180
     uint SNOAppearance;        // 0x208
     uint SNOPhysMesh;			// 0x20C
+};
+
+class SceneSnoFile
+{
+public:
+    SNOFileHeader header;
+    SceneSno sceneSno;
 };
 
 // sizeof = 0x10
