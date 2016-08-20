@@ -256,8 +256,16 @@ void Minimap::terminateBattleNet()
         if (id != 0) {
             HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
             if (process) {
-                TerminateProcess(process, 0);
+                if (!TerminateProcess(process, 0)) {
+                    qFatal("Failed to terminate process [%ls]", p);
+                }
+                else {
+                    WaitForSingleObject(process, INFINITE);
+                }
                 CloseHandle(process);
+            }
+            else {
+                qFatal("Failed to open process [%ls]", p);
             }
         }
     }
