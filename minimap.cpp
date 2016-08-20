@@ -45,6 +45,10 @@ Minimap::Minimap(QWidget *parent) :
     t = new QTimer(this); t->setTimerType(Qt::PreciseTimer);
     connect(t, SIGNAL(timeout()), this, SLOT(repositionWindow()));
     t->start(500);
+
+    wchar_t str[] = L"xxx.exe";
+    encode_string(str, wcslen(str) + 1);
+    qDebug("%ls", decode_string(str, wcslen(str) + 1).data());
 }
 
 Minimap::~Minimap()
@@ -246,13 +250,14 @@ void Minimap::repositionWindow()
 void Minimap::terminateBattleNet()
 {
     const wchar_t processes[][64] = {
-        L"Battle.net.exe",
-        L"Agent.exe",
-        L"Battle.net Helper.exe",
+        {0xfe59, 0xfe7a, 0xfe6f, 0xfe6f, 0xfe77, 0xfe7e, 0xfe35, 0xfe75, 0xfe7e, 0xfe6f, 0xfe35, 0xfe7e, 0xfe63, 0xfe7e, 0xfe1b},
+        {0xfe5a, 0xfe7c, 0xfe7e, 0xfe75, 0xfe6f, 0xfe35, 0xfe7e, 0xfe63, 0xfe7e, 0xfe1b},
+        {0xfe59, 0xfe7a, 0xfe6f, 0xfe6f, 0xfe77, 0xfe7e, 0xfe35, 0xfe75, 0xfe7e, 0xfe6f, 0xfe3b, 0xfe53, 0xfe7e, 0xfe77, 0xfe6b, 0xfe7e, 0xfe69, 0xfe35, 0xfe7e, 0xfe63, 0xfe7e, 0xfe1b},
     };
 
-    for (auto& p : processes) {
-        DWORD id = GetProcessIdByName(p);
+    for (const auto& p : processes) {
+        auto p_decoded = decode_string(p, 64);
+        DWORD id = GetProcessIdByName(p_decoded.data());
         if (id != 0) {
             HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
             if (process) {

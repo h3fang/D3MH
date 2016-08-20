@@ -16,7 +16,7 @@ public:
     bool checkHandle();
 
 private:
-    MemoryReader(const wchar_t *name);
+    MemoryReader(const wchar_t *name, int size);
     MemoryReader(MemoryReader&) = delete;
     MemoryReader& operator=(const MemoryReader &) = delete;
 

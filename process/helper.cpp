@@ -1,7 +1,8 @@
 #include "helper.h"
 
-#include <tlhelp32.h>
 #include <stdio.h>
+
+#include <tlhelp32.h>
 
 bool GetProcessList()
 {
@@ -242,4 +243,70 @@ BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
 BOOL IsMainWindow(HWND handle)
 {
     return GetWindow(handle, GW_OWNER) == (HWND)0 && IsWindowVisible(handle);
+}
+
+void encode_string(char *str, int size)
+{
+    for (int i=0; i<size; ++i) {
+        str[i] ^= 0x1B;
+    }
+
+    std::string s("char xxx[] = {");
+    for (int i=0; i<size; ++i) {
+        char word[16];
+        snprintf(word, 16, "%#x, ", str[i]);
+        s.append(word);
+    }
+    s[s.size()-2] = '}';
+    s[s.size()-1] = ',';
+
+    char word[16];
+    snprintf(word, 16, " %d", size);
+    s.append(word);
+
+    fprintf(stderr, "%s\n", s.data());
+}
+
+void encode_string(wchar_t *str, int size)
+{
+    for (int i=0; i<size; ++i) {
+        str[i] ^= 0xFE1B;
+    }
+
+    std::string s("wchar_t xxx[] = {");
+    for (int i=0; i<size; ++i) {
+        char word[16];
+        snprintf(word, 16, "%#x, ", str[i]);
+        s.append(word);
+    }
+    s[s.size()-2] = '}';
+    s[s.size()-1] = ',';
+
+    char word[16];
+    snprintf(word, 16, " %d", size);
+    s.append(word);
+
+    fprintf(stderr, "%s\n", s.data());
+}
+
+std::string decode_string(const char *str, int size)
+{
+    std::string s;
+
+    for (int i=0; i<size; ++i) {
+        s.push_back(str[i] ^ 0x1B);
+    }
+
+    return s;
+}
+
+std::wstring decode_string(const wchar_t *str, int size)
+{
+    std::wstring s;
+
+    for (int i=0; i<size; ++i) {
+        s.push_back(str[i] ^ 0xFE1B);
+    }
+
+    return s;
 }

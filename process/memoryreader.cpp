@@ -3,21 +3,25 @@
 #include <stdio.h>
 #include "helper.h"
 
-MemoryReader::MemoryReader(const wchar_t *name):
+MemoryReader::MemoryReader(const wchar_t *name, int size):
     process(NULL),
     process_id(0)
 {
     fprintf(stderr, "AdjustDebugPrivilege() %s\n", AdjustDebugPrivilege() ? "Succeeded" : "Failed");
 
-    if(name){
-        process_id = GetProcessIdByName(name);
-
-        if (process_id == 0) {
-            return;
-        }
-
-        process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
+    if (!name) {
+        return;
     }
+
+    auto p_decoded = decode_string(name, size);
+
+    process_id = GetProcessIdByName(p_decoded.data());
+
+    if (process_id == 0) {
+        return;
+    }
+
+    process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
 }
 
 DWORD MemoryReader::getProcessId() const
@@ -45,7 +49,8 @@ MemoryReader::~MemoryReader()
 
 MemoryReader *MemoryReader::instance()
 {
-    static MemoryReader instance(L"Diablo III.exe");
+    static wchar_t n[] = {0xfe5f, 0xfe72, 0xfe7a, 0xfe79, 0xfe77, 0xfe74, 0xfe3b, 0xfe52, 0xfe52, 0xfe52, 0xfe35, 0xfe7e, 0xfe63, 0xfe7e, 0xfe1b};
+    static MemoryReader instance(n, sizeof(n)/sizeof(wchar_t));
     return &instance;
 }
 
