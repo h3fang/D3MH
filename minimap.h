@@ -24,6 +24,7 @@ private slots:
     void repositionWindow();
 
 private:
+    void terminateBattleNet();
     void drawInfo(QPainter *p);
     void drawMinimap(QPainter *p);
     void drawCoordinates(QPainter *p);

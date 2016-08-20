@@ -16,7 +16,6 @@ const float CANVAS_HEIGHT = 1200.0f;
 
 Minimap::Minimap(QWidget *parent) :
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint),
-    engine(new D3::Engine()),
     d3Window(NULL),
     draw_minimap(false),
     size_changed(false),
@@ -28,8 +27,12 @@ Minimap::Minimap(QWidget *parent) :
     minimapTransform.rotate(-45.0);
     minimapTransform.scale(-1.0, 1.0);
 
+    terminateBattleNet();
+
     QDir dir(QCoreApplication::applicationDirPath());
     dir.mkdir("cache");
+
+    engine = new D3::Engine();
 
     registerHotKeys();
 
@@ -237,6 +240,26 @@ void Minimap::repositionWindow()
     }
     else {
         this->setGeometry(r);
+    }
+}
+
+void Minimap::terminateBattleNet()
+{
+    const wchar_t processes[][64] = {
+        L"Battle.net.exe",
+        L"Agent.exe",
+        L"Battle.net Helper.exe",
+    };
+
+    for (auto& p : processes) {
+        DWORD id = GetProcessIdByName(p);
+        if (id != 0) {
+            HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
+            if (process) {
+                TerminateProcess(process, 0);
+                CloseHandle(process);
+            }
+        }
     }
 }
 
