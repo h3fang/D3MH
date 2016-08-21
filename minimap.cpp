@@ -6,13 +6,34 @@
 #include <QDir>
 #include <QCoreApplication>
 
-#include <math.h>
+#include <cmath>
+#include <string>
+#include <ctime>
 
 #include "process/pointer.h"
 #include "process/helper.h"
 
 float CANVAS_WIDTH = 1500.0f;
 const float CANVAS_HEIGHT = 1200.0f;
+
+std::string random_string(const int len) {
+    static const char chars[] =
+//        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    std::string s;
+    s.reserve(len);
+
+    srand(time(NULL));
+
+    for (int i = 0; i < len; ++i) {
+        s.push_back(chars[rand() % (sizeof(chars) - 1)]);
+    }
+
+    s.push_back(0);
+    return s;
+}
 
 Minimap::Minimap(QWidget *parent) :
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint),
@@ -22,6 +43,8 @@ Minimap::Minimap(QWidget *parent) :
     hotkey_id(0)
 {
     setAttribute(Qt::WA_TranslucentBackground);
+
+    setWindowTitle(random_string(5).data());
 
     minimapTransform.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
     minimapTransform.rotate(-45.0);
