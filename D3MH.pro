@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = demh
+TARGET = HPMsg64
 TEMPLATE = app
 
 DESTDIR = ../bin
