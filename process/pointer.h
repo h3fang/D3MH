@@ -15,8 +15,9 @@ public:
     T operator()(const P ptr)
     {
         T result;
-        memset(&result, 0, sizeof(T));
-        MemoryReader::instance()->read(&result, (void*)(current_ptr+ptr), sizeof(T));
+        if (!MemoryReader::instance()->read(&result, (void*)(current_ptr+ptr), sizeof(T))) {
+            memset(&result, 0xff, sizeof(T));
+        }
         return result;
     }
 
