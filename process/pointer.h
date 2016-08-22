@@ -1,6 +1,8 @@
 #ifndef UTILITIES_POINTER_H
 #define UTILITIES_POINTER_H
 
+#include <cstring>
+
 #include "memoryreader.h"
 
 template<class T>
@@ -25,8 +27,14 @@ public:
     T operator()(const P ptr, const Ptrs... ptrs)
     {
         current_ptr += ptr;
-        MemoryReader::instance()->read(&current_ptr, (void*)current_ptr, sizeof(void*));
-        return this->operator ()(ptrs...);
+        if (MemoryReader::instance()->read(&current_ptr, (void*)current_ptr, sizeof(void*))) {
+            return this->operator ()(ptrs...);
+        }
+        else {
+            T result;
+            memset(&result, 0xff, sizeof(T));
+            return result;
+        }
     }
 
 private:
