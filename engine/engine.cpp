@@ -51,7 +51,7 @@ bool Engine::update()
     }
     else {
         acds.clear();
-        navMesh->clear();
+        navMesh->clearAll();
     }
 
     return true;

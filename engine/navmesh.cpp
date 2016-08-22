@@ -229,9 +229,13 @@ void NavMesh::update()
     fetchScene();
 }
 
+void NavMesh::clearAll()
+{
+    sceneData.clear();
+}
+
 void NavMesh::clear()
 {
-//    sceneData.clear();
     for (auto it=sceneData.begin(); it!=sceneData.end();) {
         if((*it)->world_sno_id != current_world_sno_id){
             it = sceneData.erase(it);
@@ -258,8 +262,10 @@ void NavMesh::fetchScene()
     for (const auto& s : enumerate_container(c)) {
         if (s.x000_Id == INVALID_SNO_ID ||
                 s.x0E8_SceneSnoId == INVALID_SNO_ID ||
-                s.x104_MeshMinZ < -100 ||
-                s.x104_MeshMinZ > 100) {
+                s.x174_MeshMaxX <= s.x0FC_MeshMinX ||
+                s.x178_MeshMaxY <= s.x100_MeshMinY ||
+                s.x104_MeshMinZ < -10000.0 ||
+                s.x104_MeshMinZ > 10000.0) {
             continue;
         }
 

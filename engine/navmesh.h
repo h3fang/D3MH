@@ -81,8 +81,11 @@ public:
     NavMesh(Engine *e);
     ~NavMesh();
 
-    void loadSceneSnoFiles();
     void update();
+    void clearAll();
+
+private:
+    void loadSceneSnoFiles();
     void clear();
     void fetchScene();
     void fetchSceneSno();
