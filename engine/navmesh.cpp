@@ -140,6 +140,7 @@ bool SceneSnoData::load(uint sno_id)
 SceneData::SceneData() :
     id(INVALID_SNO_ID),
     sno_id(INVALID_SNO_ID),
+    navmesh_id(INVALID_SNO_ID),
     world_sno_id(INVALID_SNO_ID),
     min(Vec3{0, 0, 0}),
     max(Vec3{0, 0, 0})
@@ -155,6 +156,7 @@ void SceneData::fromScene(const Scene &s)
 {
     id = s.x000_Id;
     sno_id = s.x0E8_SceneSnoId;
+    navmesh_id = s.x004_NavMeshId;
     world_sno_id = s.x050_WorldsSnoId;
 
     min.x = s.x0FC_MeshMinX;
@@ -231,7 +233,7 @@ void NavMesh::clear()
 {
 //    sceneData.clear();
     for (auto it=sceneData.begin(); it!=sceneData.end();) {
-        if(it->second->world_sno_id != last_world_sno_id){
+        if((*it)->world_sno_id != last_world_sno_id){
             it = sceneData.erase(it);
         }
         else {
@@ -261,7 +263,11 @@ void NavMesh::fetchScene()
             continue;
         }
 
-        sceneData[s.x004_NavMeshId] = std::make_shared<SceneData>(s);
+        auto sd = std::make_shared<SceneData>(s);
+
+        // insert and replace the old one if it exists
+        sceneData.erase(sd);
+        sceneData.insert(sd);
     }
 }
 

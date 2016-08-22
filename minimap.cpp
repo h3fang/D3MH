@@ -160,8 +160,7 @@ void Minimap::drawMinimap(QPainter *p)
     QVector<QRectF> scene_cells, scene_grids;
     scene_cells.reserve(100*engine->navMesh->sceneData.size());
 
-    for (const auto& pair : engine->navMesh->sceneData) {
-        D3::SceneDataPtr s = pair.second;
+    for (const auto& s : engine->navMesh->sceneData) {
         scene_grids.push_back(QRectF(s->min.x, s->min.y, s->max.x-s->min.x, s->max.y-s->min.y));
 
         auto ss = s->findSceneSnoData();
