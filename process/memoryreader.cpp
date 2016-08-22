@@ -7,8 +7,6 @@ MemoryReader::MemoryReader(const wchar_t *name, int size):
     process(NULL),
     process_id(0)
 {
-    fprintf(stderr, "AdjustDebugPrivilege() %s\n", AdjustDebugPrivilege() ? "Succeeded" : "Failed");
-
     if (!name) {
         return;
     }

@@ -3,9 +3,12 @@
 #include <stdio.h>
 
 #include "engine/structs.h"
+#include "process/helper.h"
 
 int main(int argc, char *argv[])
 {
+    fprintf(stderr, "AdjustDebugPrivilege() %s\n", AdjustDebugPrivilege() ? "Succeeded" : "Failed");
+
     QApplication a(argc, argv);
 
     Minimap w;
