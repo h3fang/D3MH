@@ -89,7 +89,7 @@ public:
 
 private:
     Engine* engine;
-    uint last_world_sno_id;
+    uint current_world_sno_id;
 };
 
 }

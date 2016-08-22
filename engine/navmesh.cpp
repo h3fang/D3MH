@@ -181,7 +181,7 @@ SceneSnoDataPtr SceneData::findSceneSnoData()
 
 NavMesh::NavMesh(Engine *e) :
     engine(e),
-    last_world_sno_id(INVALID_SNO_ID)
+    current_world_sno_id(INVALID_SNO_ID)
 {
     loadSceneSnoFiles();
 }
@@ -233,7 +233,7 @@ void NavMesh::clear()
 {
 //    sceneData.clear();
     for (auto it=sceneData.begin(); it!=sceneData.end();) {
-        if((*it)->world_sno_id != last_world_sno_id){
+        if((*it)->world_sno_id != current_world_sno_id){
             it = sceneData.erase(it);
         }
         else {
@@ -247,8 +247,8 @@ void NavMesh::fetchScene()
     // NOTE:offset
     uint world_sno_id = engine->localData.x0C_WorldSnoId;
 
-    if(world_sno_id != last_world_sno_id){
-        last_world_sno_id = world_sno_id;
+    if(world_sno_id != current_world_sno_id){
+        current_world_sno_id = world_sno_id;
         clear();
     }
 
