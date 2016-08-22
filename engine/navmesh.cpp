@@ -140,7 +140,7 @@ bool SceneSnoData::load(uint sno_id)
 SceneData::SceneData() :
     id(INVALID_SNO_ID),
     sno_id(INVALID_SNO_ID),
-    levelArea_sno_id(INVALID_SNO_ID),
+    world_sno_id(INVALID_SNO_ID),
     min(Vec3{0, 0, 0}),
     max(Vec3{0, 0, 0})
 {
@@ -155,7 +155,7 @@ void SceneData::fromScene(const Scene &s)
 {
     id = s.x000_Id;
     sno_id = s.x0E8_SceneSnoId;
-    levelArea_sno_id = s.x018_LevelAreaSnoId;
+    world_sno_id = s.x050_WorldsSnoId;
 
     min.x = s.x0FC_MeshMinX;
     min.y = s.x100_MeshMinY;
@@ -229,7 +229,15 @@ void NavMesh::update()
 
 void NavMesh::clear()
 {
-    sceneData.clear();
+//    sceneData.clear();
+    for (auto it=sceneData.begin(); it!=sceneData.end();) {
+        if(it->second->world_sno_id != last_world_sno_id){
+            it = sceneData.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
 }
 
 void NavMesh::fetchScene()

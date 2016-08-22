@@ -36,7 +36,7 @@ class SceneData
 public:
     uint id;
     uint sno_id;
-    uint levelArea_sno_id;
+    uint world_sno_id;
     Vec3 min;
     Vec3 max;
 
