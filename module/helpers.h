@@ -10,6 +10,7 @@
 
 namespace D3 {
 
+bool isMonster(const ActorCommonData& acd);
 bool isTreasureGoblin(const ActorCommonData& acd);
 bool isShrine(const ActorCommonData& acd);
 bool isPoolOfReflection(const ActorCommonData& acd);
