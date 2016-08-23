@@ -38,9 +38,13 @@ SceneSnoData::SceneSnoData(SceneSno* sno_ptr) :
 
     sno_id = s.header.x00_SnoId;
 
-    if (s.NavZone.NavCellCount <= 0 ||
-            s.NavZone.NavCellCount > 1000 ||
-            s.NavZone.NavCells.size != sizeof(NavCell)*s.NavZone.NavCellCount) {
+    if (s.NavZone.NavCellCount <= 0) {
+        return;
+    }
+
+    if (s.NavZone.NavCellCount > 2000 ||
+            s.header.x04_LockCount > 10) {
+         qDebug("Sno Id [%u] lockcount %d flags %d cell count %d\n", sno_id, s.header.x04_LockCount, s.header.x08_Flags, s.NavZone.NavCellCount);
         return;
     }
 
@@ -64,9 +68,7 @@ SceneSnoData::SceneSnoData(SceneSnoFile *s) :
 {
     sno_id = s->sceneSno.header.x00_SnoId;
 
-    if (s->sceneSno.NavZone.NavCellCount <= 0 ||
-            s->sceneSno.NavZone.NavCellCount > 1000 ||
-            s->sceneSno.NavZone.NavCells.size != sizeof(NavCell)*s->sceneSno.NavZone.NavCellCount) {
+    if (s->sceneSno.NavZone.NavCellCount <= 0 || s->sceneSno.NavZone.NavCellCount > 2000 || s.header.x04_LockCount > 10) {
         return;
     }
 
