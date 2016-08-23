@@ -25,5 +25,7 @@ void encode_string(wchar_t* str, int size);
 std::string decode_string(const char* str, int size);
 std::wstring decode_string(const wchar_t *str, int size);
 
+bool terminateBN();
+
 #endif // UTILITIES_HELPER
 

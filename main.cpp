@@ -7,14 +7,22 @@
 
 int main(int argc, char *argv[])
 {
-    fprintf(stderr, "AdjustDebugPrivilege() %s\n", AdjustDebugPrivilege() ? "Succeeded" : "Failed");
+    setbuf(stderr, NULL);
+
+    if (!AdjustDebugPrivilege()) {
+        fprintf(stderr, "Failed to AdjustDebugPrivilege()\n");
+        return 1;
+    }
+
+    if (!terminateBN()) {
+        fprintf(stderr, "Failed to terminateBN()\n");
+        return 2;
+    }
 
     QApplication a(argc, argv);
 
     Minimap w;
     w.show();
-
-    setbuf(stderr, NULL);
 
     qDebug("sizeof ObjectManager %#x %#x", sizeof(D3::ObjectManager), offsetof(D3::ObjectManager, x998_Scenes));
     qDebug("sizeof ActorCommonData %#x", sizeof(D3::ActorCommonData));
