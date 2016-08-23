@@ -68,7 +68,7 @@ SceneSnoData::SceneSnoData(SceneSnoFile *s) :
 {
     sno_id = s->sceneSno.header.x00_SnoId;
 
-    if (s->sceneSno.NavZone.NavCellCount <= 0 || s->sceneSno.NavZone.NavCellCount > 2000 || s.header.x04_LockCount > 10) {
+    if (s->sceneSno.NavZone.NavCellCount <= 0 || s->sceneSno.NavZone.NavCellCount > 2000 || s->sceneSno.header.x04_LockCount > 10) {
         return;
     }
 
