@@ -5,7 +5,7 @@ namespace D3 {
 
 const unsigned int INVALID_SNO_ID = 0xFFFFFFFF;
 
-enum SnoGroupId : unsigned int
+enum SnoGroupId
 {
     SnoGroupId_Actor = 1,
     SnoGroupId_Adventure = 2,

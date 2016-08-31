@@ -168,7 +168,7 @@ public:
     Container<void>* x14_Container;
     uint x18_Flags;
     char x1C_Name[32];
-    SnoGroupId x3C_SnoGroupId;
+    int x3C_SnoGroupId;
     int x40;
     int x44;
     int x48;
