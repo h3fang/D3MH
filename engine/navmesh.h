@@ -39,8 +39,8 @@ public:
     uint sno_id;
     uint navmesh_id;
     uint world_sno_id;
-    Vec3 min;
-    Vec3 max;
+    Vec2 min;
+    Vec2 max;
 
 public:
     SceneData();
@@ -62,6 +62,8 @@ public:
             size_t res = 17 + k->navmesh_id;
             res = res * 31 + std::hash<float>()( k->min.x );
             res = res * 31 + std::hash<float>()( k->min.y );
+            res = res * 31 + std::hash<float>()( k->max.x );
+            res = res * 31 + std::hash<float>()( k->max.y );
             return res;
         }
     };
@@ -70,11 +72,13 @@ public:
         bool operator()( const SceneDataPtr& lhs, const SceneDataPtr& rhs) const {
             return lhs->navmesh_id == rhs->navmesh_id &&
                     std::fabs(lhs->min.x - rhs->min.x) < 0.1 &&
-                    std::fabs(lhs->min.y - rhs->min.y) < 0.1;
+                    std::fabs(lhs->min.y - rhs->min.y) < 0.1 &&
+                    std::fabs(lhs->max.x - rhs->max.x) < 0.1 &&
+                    std::fabs(lhs->max.y - rhs->max.y) < 0.1;
         }
     };
 
-    static std::unordered_map<uint, SceneSnoDataPtr> snoSceneIdAddrMap;
+    static std::unordered_map<uint, SceneSnoDataPtr> sceneSnoData;
     std::unordered_set<SceneDataPtr, KeyHasher, KeyCmp> sceneData;
 
 public:

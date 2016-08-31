@@ -16,7 +16,7 @@
 
 namespace D3 {
 
-std::unordered_map<uint, SceneSnoDataPtr> NavMesh::snoSceneIdAddrMap;
+std::unordered_map<uint, SceneSnoDataPtr> NavMesh::sceneSnoData;
 
 SceneSnoData::SceneSnoData() :
     sno_id(INVALID_SNO_ID),
@@ -144,8 +144,8 @@ SceneData::SceneData() :
     sno_id(INVALID_SNO_ID),
     navmesh_id(INVALID_SNO_ID),
     world_sno_id(INVALID_SNO_ID),
-    min(Vec3{0, 0, 0}),
-    max(Vec3{0, 0, 0})
+    min(Vec2{0, 0}),
+    max(Vec2{0, 0})
 {
 }
 
@@ -163,21 +163,19 @@ void SceneData::fromScene(const Scene &s)
 
     min.x = s.x0FC_MeshMinX;
     min.y = s.x100_MeshMinY;
-    min.z = s.x104_MeshMinZ;
 
     max.x = s.x174_MeshMaxX;
     max.y = s.x178_MeshMaxY;
-    max.z = s.x104_MeshMinZ; //there is no max z, so consider all grid cells flat
 }
 
 SceneSnoDataPtr SceneData::findSceneSnoData()
 {
-    if (NavMesh::snoSceneIdAddrMap.find(sno_id) == NavMesh::snoSceneIdAddrMap.end()) {
-        qDebug("No record for AssetScene id [%u] in NavMesh::snoSceneIdAddrMap", sno_id);
+    if (NavMesh::sceneSnoData.find(sno_id) == NavMesh::sceneSnoData.end()) {
+        qDebug("No record for SceneSno id [%u] in NavMesh::SceneSnoData", sno_id);
         return SceneSnoDataPtr();
     }
     else {
-        return NavMesh::snoSceneIdAddrMap[sno_id];
+        return NavMesh::sceneSnoData[sno_id];
     }
 }
 
@@ -190,7 +188,7 @@ NavMesh::NavMesh(Engine *e) :
 
 NavMesh::~NavMesh()
 {
-    for (const auto& pair : snoSceneIdAddrMap) {
+    for (const auto& pair : sceneSnoData) {
         if (!pair.second->loaded) {
             pair.second->save();
         }
@@ -207,22 +205,22 @@ void NavMesh::loadSceneSnoFiles()
         if (ok) {
             SceneSnoDataPtr ss = std::make_shared<SceneSnoData>(sno_id);
             if (!ss->cells.empty()) {
-                snoSceneIdAddrMap[sno_id] = ss;
+                sceneSnoData[sno_id] = ss;
             }
         }
     }
 
-    qDebug("loaded %u SceneSno files", snoSceneIdAddrMap.size());
+    qDebug("loaded %u SceneSno files", sceneSnoData.size());
 
     uint min = 0xFFFFFFFF, max = 0, total = 0;
-    for (const auto& p : snoSceneIdAddrMap) {
+    for (const auto& p : sceneSnoData) {
         uint size = p.second->cells.size();
         max = size > max ? size : max;
         min = size < min ? size : min;
         total += size;
     }
 
-    qDebug("Scene Sno Files cell count, min: %d, max: %d, average: %f", min, max, total/float(snoSceneIdAddrMap.size()));
+    qDebug("Scene Sno Files cell count, min: %d, max: %d, average: %f", min, max, total/float(sceneSnoData.size()));
 }
 
 void NavMesh::update()
@@ -265,9 +263,7 @@ void NavMesh::fetchScene()
         if (s.x000_Id == INVALID_SNO_ID ||
                 s.x0E8_SceneSnoId == INVALID_SNO_ID ||
                 s.x174_MeshMaxX <= s.x0FC_MeshMinX ||
-                s.x178_MeshMaxY <= s.x100_MeshMinY ||
-                s.x104_MeshMinZ < -10000.0 ||
-                s.x104_MeshMinZ > 10000.0) {
+                s.x178_MeshMaxY <= s.x100_MeshMinY) {
             continue;
         }
 
@@ -292,8 +288,8 @@ void NavMesh::fetchSceneSno()
         }
 
         SceneSnoDataPtr s = std::make_shared<SceneSnoData>((SceneSno *)d.x0C_pSNOAddr);
-        if (!s->cells.empty()/* && snoSceneIdAddrMap.find(s->sno_id) == snoSceneIdAddrMap.end()*/) {
-            snoSceneIdAddrMap[s->sno_id] = s;
+        if (!s->cells.empty()/* && sceneSnoData.find(s->sno_id) == sceneSnoData.end()*/) {
+            sceneSnoData[s->sno_id] = s;
         }
     }
 }
