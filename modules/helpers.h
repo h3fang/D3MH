@@ -1,11 +1,12 @@
 #ifndef D3MH_HELPERS_H
 #define D3MH_HELPERS_H
 
+#include <cstdio>
 #include <vector>
 
 #include <utils/precisetimer.h>
 
-#include "engine/structs.h"
+#include "datatypes/structs.h"
 #include "process/memoryreader.h"
 
 namespace D3 {

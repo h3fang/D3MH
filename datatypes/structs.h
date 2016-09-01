@@ -9,7 +9,6 @@
 #include "objectmanager.h"
 #include "scene.h"
 #include "sno.h"
-#include "navmesh.h"
 
 #endif // D3MH_STRUCTS
 

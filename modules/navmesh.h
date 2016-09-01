@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "structs.h"
+#include "datatypes/structs.h"
 
 namespace D3 {
 

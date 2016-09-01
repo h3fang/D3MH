@@ -5,8 +5,9 @@
 
 #include <utils/precisetimer.h>
 
-#include "structs.h"
-#include "module/helpers.h"
+#include "datatypes/structs.h"
+#include "helpers.h"
+#include "navmesh.h"
 
 namespace D3 {
 

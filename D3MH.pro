@@ -19,33 +19,33 @@ INCLUDEPATH += ../ISS/include
 
 SOURCES += main.cpp\
     minimap.cpp \
-    engine/engine.cpp \
     process/memoryreader.cpp \
     process/helper.cpp \
-    engine/navmesh.cpp \
-    module/snocache.cpp \
-    module/helpers.cpp
+    modules/engine.cpp \
+    modules/navmesh.cpp \
+    modules/snocache.cpp \
+    modules/helpers.cpp
 
 HEADERS  += minimap.h \
-    engine/engine.h \
-    engine/objectmanager.h \
-    engine/structs.h \
-    engine/types.h \
-    engine/localdata.h \
-    engine/scene.h \
-    engine/actor.h \
-    engine/sno.h \
-    engine/snoenum.h \
+    datatypes/objectmanager.h \
+    datatypes/structs.h \
+    datatypes/types.h \
+    datatypes/localdata.h \
+    datatypes/scene.h \
+    datatypes/actor.h \
+    datatypes/sno.h \
+    datatypes/snoenum.h \
+    datatypes/levelarea.h \
+    datatypes/marker.h \
+    datatypes/ui.h \
+    datatypes/actorcommondata.h \
     process/helper.h \
     process/memoryreader.h \
-    engine/navmesh.h \
     process/pointer.h \
-    engine/levelarea.h \
-    engine/marker.h \
-    engine/ui.h \
-    engine/actorcommondata.h \
-    module/snocache.h \
-    module/helpers.h
+    modules/engine.h \
+    modules/navmesh.h \
+    modules/snocache.h \
+    modules/helpers.h
 
 RC_FILE = default.rc
 

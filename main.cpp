@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <stdio.h>
 
-#include "engine/structs.h"
+#include "datatypes/structs.h"
 #include "process/helper.h"
 
 int main(int argc, char *argv[])
