@@ -185,15 +185,15 @@ struct Scene {
 class SceneRevealInfo
 {
 public:
-    int x00_SceneSnoId;
-    int x04_SceneId_;
-    int x08_WorldId_;
-    int x0C_TextureSnoId;
+    uint x00_SceneSnoId;
+    uint x04_SceneId_;
+    uint x08_WorldId_;
+    uint x0C_TextureSnoId;
     float x10_MinX;
     float x14_MinY;
     float x18_MaxX;
     float x1C_MaxY;
-    int x20_TextureSnoId_;
+    uint x20_TextureSnoId_;
     char* x24_OpacityMask; // 8 bits-per-channel grayscale channel
     int x28_OpacityMaskWidth;
     int x2C_OpacityMaskHeight;

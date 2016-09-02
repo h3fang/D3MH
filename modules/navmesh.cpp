@@ -151,11 +151,6 @@ SceneData::SceneData() :
 
 SceneData::SceneData(const Scene &s)
 {
-    fromScene(s);
-}
-
-void SceneData::fromScene(const Scene &s)
-{
     id = s.x000_Id;
     sno_id = s.x0E8_SceneSnoId;
     navmesh_id = s.x004_NavMeshId;
@@ -166,6 +161,20 @@ void SceneData::fromScene(const Scene &s)
 
     max.x = s.x174_MeshMaxX;
     max.y = s.x178_MeshMaxY;
+}
+
+SceneData::SceneData(const SceneRevealInfo &s)
+{
+    id = s.x04_SceneId_;
+    sno_id = s.x00_SceneSnoId;
+    navmesh_id = s.x00_SceneSnoId; // for convenience
+    world_sno_id = INVALID_SNO_ID;
+
+    min.x = s.x10_MinX;
+    min.y = s.x14_MinY;
+
+    max.x = s.x18_MaxX;
+    max.y = s.x1C_MaxY;
 }
 
 SceneSnoDataPtr SceneData::findSceneSnoData()
@@ -256,6 +265,7 @@ void NavMesh::fetchScene()
         clear();
     }
 
+    // from ObjectManager
     // NOTE:offset
     Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager, offsetof(ObjectManager, x998_Scenes), 0);
 
@@ -268,6 +278,35 @@ void NavMesh::fetchScene()
         }
 
         auto sd = std::make_shared<SceneData>(s);
+
+        // insert and replace the old one if it exists
+        sceneData.erase(sd);
+        sceneData.insert(sd);
+    }
+
+    // from LevelArea
+    // NOTE:offset
+    ListPack<SceneRevealInfo> sri = Pointer<ListPack<SceneRevealInfo>>()(Addr_LevelArea, offsetof(LevelArea, x010_ListPack_Allocator_10x68Bytes_RevealedScenes));
+
+    if (sri.x10_NodeAllocator.x18_GoodFood != 0x600DF00D) {
+        qDebug("NavMesh::fetchScene() LevelArea ListPack<SceneRevealInfo> bad food");
+        return;
+    }
+
+    LinkedListNode<SceneRevealInfo>* node_ptr = sri.First;
+
+    while (node_ptr) {
+        LinkedListNode<SceneRevealInfo> node = Pointer<LinkedListNode<SceneRevealInfo>>()(node_ptr);
+
+        node_ptr = node.Next;
+
+        if (node.Value.x00_SceneSnoId == INVALID_SNO_ID ||
+                node.Value.x18_MaxX <= node.Value.x10_MinX ||
+                node.Value.x1C_MaxY <= node.Value.x14_MinY) {
+            continue;
+        }
+
+        auto sd = std::make_shared<SceneData>(node.Value);
 
         // insert and replace the old one if it exists
         sceneData.erase(sd);

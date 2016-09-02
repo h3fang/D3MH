@@ -45,8 +45,8 @@ public:
 public:
     SceneData();
     SceneData(const Scene &s);
+    SceneData(const SceneRevealInfo &s);
 
-    void fromScene(const Scene &s);
     SceneSnoDataPtr findSceneSnoData();
 };
 
