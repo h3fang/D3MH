@@ -259,29 +259,11 @@ void NavMesh::fetchScene()
 {
     // NOTE:offset
     uint world_sno_id = engine->localData.x0C_WorldSnoId;
+    uint world_id = Pointer<uint>()(Addr_ObjectManager, 0x790, 0x38);;
 
     if(world_sno_id != current_world_sno_id){
         current_world_sno_id = world_sno_id;
         clear();
-    }
-
-    // from ObjectManager
-    // NOTE:offset
-    Container<Scene> c = Pointer<Container<Scene>>()(Addr_ObjectManager, offsetof(ObjectManager, x998_Scenes), 0);
-
-    for (const auto& s : enumerate_container(c)) {
-        if (s.x000_Id == INVALID_SNO_ID ||
-                s.x0E8_SceneSnoId == INVALID_SNO_ID ||
-                s.x174_MeshMaxX <= s.x0FC_MeshMinX ||
-                s.x178_MeshMaxY <= s.x100_MeshMinY) {
-            continue;
-        }
-
-        auto sd = std::make_shared<SceneData>(s);
-
-        // insert and replace the old one if it exists
-        sceneData.erase(sd);
-        sceneData.insert(sd);
     }
 
     // from LevelArea
@@ -301,6 +283,7 @@ void NavMesh::fetchScene()
         node_ptr = node.Next;
 
         if (node.Value.x00_SceneSnoId == INVALID_SNO_ID ||
+                node.Value.x08_WorldId_ != world_id ||
                 node.Value.x18_MaxX <= node.Value.x10_MinX ||
                 node.Value.x1C_MaxY <= node.Value.x14_MinY) {
             continue;
