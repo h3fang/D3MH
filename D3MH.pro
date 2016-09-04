@@ -17,14 +17,19 @@ CONFIG += c++14
 
 INCLUDEPATH += ../ISS/include
 
+LIBS += -lwinmm
+
 SOURCES += main.cpp\
     minimap.cpp \
-    process/memoryreader.cpp \
-    process/helper.cpp \
     modules/engine.cpp \
     modules/navmesh.cpp \
     modules/snocache.cpp \
-    modules/helpers.cpp
+    modules/helpers.cpp \
+    modules/autoloot.cpp \
+    utils/memoryreader.cpp \
+    utils/helper.cpp \
+    utils/hook.cpp \
+    utils/keyboardmouse.cpp
 
 HEADERS  += minimap.h \
     datatypes/objectmanager.h \
@@ -39,13 +44,17 @@ HEADERS  += minimap.h \
     datatypes/marker.h \
     datatypes/ui.h \
     datatypes/actorcommondata.h \
-    process/helper.h \
-    process/memoryreader.h \
-    process/pointer.h \
     modules/engine.h \
     modules/navmesh.h \
     modules/snocache.h \
-    modules/helpers.h
+    modules/helpers.h \
+    modules/autoloot.h \
+    utils/helper.h \
+    utils/memoryreader.h \
+    utils/pointer.h \
+    utils/hook.h \
+    utils/keyboardmouse.h \
+    utils/point.h
 
 RC_FILE = default.rc
 

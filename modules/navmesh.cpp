@@ -9,8 +9,8 @@
 #include <QDebug>
 #include <QDir>
 
-#include "process/memoryreader.h"
-#include "process/pointer.h"
+#include "utils/memoryreader.h"
+#include "utils/pointer.h"
 
 #include "engine.h"
 

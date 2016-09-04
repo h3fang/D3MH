@@ -87,7 +87,7 @@ enum ActorType
 
 enum MonsterRace
 {
-    MobRace_Unknown = INVALID_SNO_ID,
+    MobRace_Unknown = -1,
     MobRace_Fallen = 1,
     MobRace_GoatMen = 2,
     MobRace_Rogue = 3,
@@ -102,7 +102,7 @@ enum MonsterRace
 
 enum MonsterType
 {
-    MobType_Unknown = INVALID_SNO_ID,
+    MobType_Unknown = -1,
     MobType_Undead = 0,
     MobType_Demon = 1,
     MobType_Beast = 2,
@@ -127,7 +127,7 @@ enum class MonsterQuality
 
 enum ItemLocation
 {
-    ItemLoc_UnknownLoc = INVALID_SNO_ID, //  meaning NPC or item on the ground.
+    ItemLoc_UnknownLoc = -1, //  meaning NPC or item on the ground.
     ItemLoc_Backpack = 0,
     ItemLoc_Head = 1,
     ItemLoc_Torso = 2,

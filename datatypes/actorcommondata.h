@@ -37,7 +37,13 @@ struct ActorCommonData{ // sizeof = 0x2F8
     int _x104;
     uint x108_WorldId;
     uint x10C_SceneId;
-    uchar x110[0x180-0x110];
+    int x110_ItemSocketHostAcdId_StructStart_Min16Bytes;
+    int x114_ItemLocation;
+    int x118_ItemSlotX;
+    int x11C_ItemSlotY;
+    int x120_FastAttribGroupId;
+    int x124_Id_FastAttribGroupId;
+    uchar x128[0x180-0x128];
     int x180_GizmoType;
     int x184_ActorType;
     float x188_Hitpoints;

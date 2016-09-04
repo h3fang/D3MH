@@ -2,14 +2,25 @@
 #define D3MH_HELPERS_H
 
 #include <cstdio>
+#include <cmath>
 #include <vector>
 
 #include <utils/precisetimer.h>
 
 #include "datatypes/structs.h"
-#include "process/memoryreader.h"
+#include "utils/memoryreader.h"
 
 namespace D3 {
+
+template<class T>
+T distance(T x1, T y1, T x2, T y2) {
+    return std::sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+}
+
+template<class T>
+T distance(T x1, T y1, T z1, T x2, T y2, T z2) {
+    return std::sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
+}
 
 bool isMonster(const ActorCommonData& acd);
 bool isTreasureGoblin(const ActorCommonData& acd);

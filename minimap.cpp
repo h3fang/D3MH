@@ -10,8 +10,8 @@
 #include <string>
 #include <ctime>
 
-#include "process/pointer.h"
-#include "process/helper.h"
+#include "utils/pointer.h"
+#include "utils/helper.h"
 
 float CANVAS_WIDTH = 1500.0f;
 const float CANVAS_HEIGHT = 1200.0f;

@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "process/pointer.h"
+#include "utils/pointer.h"
 #include "snocache.h"
 
 namespace D3 {

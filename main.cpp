@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "datatypes/structs.h"
-#include "process/helper.h"
+#include "utils/helper.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +18,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Failed to terminateBN()\n");
         return 2;
     }
+
+    timeBeginPeriod(1);
 
     QApplication a(argc, argv);
 
@@ -35,5 +37,9 @@ int main(int argc, char *argv[])
     qDebug("sizeof SnoDefinition %#x", sizeof(D3::SnoDefinition));
     qDebug("sizeof LevelArea %#x %#x", sizeof(D3::LevelArea), offsetof(D3::LevelArea, x044_SnoId));
 
-    return a.exec();
+    auto r = a.exec();
+
+    timeEndPeriod(1);
+
+    return r;
 }
