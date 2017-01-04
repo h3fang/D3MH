@@ -3,7 +3,7 @@
 
 namespace D3 {
 
-const unsigned int INVALID_SNO_ID = 0xFFFFFFFF;
+const unsigned int INVALID_ID = 0xFFFFFFFF;
 
 enum SnoGroupId
 {
@@ -69,20 +69,64 @@ enum SnoGroupId
     SnoGroupId_Vibrations = 68,
 };
 
-enum ActorType
+enum class GizmoType {
+    Invalid = -1,
+    Door = 0,
+    Chest = 1,
+    Portal = 2,
+    Waypoint = 4,
+    Item = 5, // Not included in Symbols
+    Checkpoint = 7,
+    Sign = 8,
+    HealingWell = 9,
+    PowerUp = 10,
+    TownPortal = 11,
+    HearthPortal = 12,
+    Headstone = 18,
+    PortalDestination = 20,
+    BreakableChest = 23,
+    SharedStash = 25,
+    Spawner = 28,
+    PageOfFatePortal = 33,
+    Trigger = 44,
+    SecretPortal = 47,
+    DestroyableObject = 48,
+    BreakableDoor = 56,
+    Switch = 57,
+    PressurePlate = 58,
+    Gate = 59,
+    DestroySelfWhenNear = 60,
+    ActTransitionObject = 62,
+    ReformingDestroyableObject = 63,
+    Banner = 64,
+    LoreChest = 65,
+    BossPortal = 66,
+    PlacedLoot = 67,
+    SavePoint = 68,
+    ReturnPointPortal = 69,
+    DungeonPortal = 70,
+    IdentifyAll = 71,
+    ReturnPortal = 75,
+    RecreateGameWithParty = 76,
+    Mailbox = 77,
+    LootRunSwitch = 78,
+    PoolOfReflection = 79
+};
+
+enum class ActorType
 {
-    ActorType_Invalid = 0,
-    ActorType_Monster = 1,
-    ActorType_Gizmo = 2,
-    ActorType_ClientEffect = 3,
-    ActorType_ServerProp = 4,
-    ActorType_Enviroment = 5,
-    ActorType_Critter = 6,
-    ActorType_Player = 7,
-    ActorType_Item = 8,
-    ActorType_AxeSymbol = 9,
-    ActorType_Projectile = 10,
-    ActorType_CustomBrain = 11
+    Invalid = 0,
+    Monster = 1,
+    Gizmo = 2,
+    ClientEffect = 3,
+    ServerProp = 4,
+    Enviroment = 5,
+    Critter = 6,
+    Player = 7,
+    Item = 8,
+    AxeSymbol = 9,
+    Projectile = 10,
+    CustomBrain = 11
 };
 
 enum MonsterRace

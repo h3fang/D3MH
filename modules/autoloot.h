@@ -2,9 +2,11 @@
 #define D3MH_AUTOLOOT_H
 
 #include <vector>
-#include <atomic>
 
 #include <datatypes/structs.h>
+
+class KeyboardMouse;
+class Hook;
 
 namespace D3 {
 
@@ -12,10 +14,8 @@ const float MAX_LOOT_RADIUS = 40.0f;
 
 class Engine;
 
-extern std::atomic<bool> is_looting;
-
 struct Item {
-    uint actor_sno_id;
+    uint actor_id;
     float x;
     float y;
     float z;
@@ -26,17 +26,19 @@ class AutoLoot
 {
 public:
     AutoLoot(Engine* e);
+    ~AutoLoot();
 
     void loot();
 
 private:
     std::vector<Item> getItemsToLoot();
-    bool isGem(const ActorCommonData& acd);
-    bool isMaterial(const ActorCommonData& acd);
 
 private:
-    bool is_looting;
     Engine* engine;
+    KeyboardMouse* kbm;
+    Hook* hook;
+
+    int screen_height, screen_width;
 };
 
 }

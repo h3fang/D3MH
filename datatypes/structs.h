@@ -3,6 +3,7 @@
 
 #include "actor.h"
 #include "actorcommondata.h"
+#include "attributedescriptor.h"
 #include "localdata.h"
 #include "levelarea.h"
 #include "marker.h"

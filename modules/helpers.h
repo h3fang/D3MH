@@ -9,6 +9,7 @@
 
 #include "datatypes/structs.h"
 #include "utils/memoryreader.h"
+#include "utils/point.h"
 
 namespace D3 {
 
@@ -22,10 +23,16 @@ T distance(T x1, T y1, T z1, T x2, T y2, T z2) {
     return std::sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
 }
 
+
+
+bool isGem(const ActorCommonData& acd);
+bool isMaterial(const ActorCommonData& acd);
+
 bool isMonster(const ActorCommonData& acd);
 bool isTreasureGoblin(const ActorCommonData& acd);
 bool isShrine(const ActorCommonData& acd);
 bool isPoolOfReflection(const ActorCommonData& acd);
+Point toScreenCoordinate(float x, float y, float z, LocalData* ld, float width, float height);
 
 template<class T>
 std::vector<T> enumerate_container(const Container<T>& c)

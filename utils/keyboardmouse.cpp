@@ -45,21 +45,16 @@ KeyboardMouse::~KeyboardMouse()
 
 bool KeyboardMouse::keyClick(int vk)
 {
-    injecting_keyboard_events = true;
-
     if (!keyPress(vk)) {
-        injecting_keyboard_events = false;
         return false;
     }
 
     Sleep(clamp(80 + norm_dist(generator)*5, 60.0f, 100.0f));
 
     if (!keyRelease(vk)) {
-        injecting_keyboard_events = false;
         return false;
     }
 
-    injecting_keyboard_events = false;
     return true;
 }
 
@@ -115,8 +110,6 @@ bool KeyboardMouse::mouseMove(Point target, bool absolute)
     Point p2 = r2*p0 + (1-r2)*target + 0.1*norm_dist(generator)*normal;
     auto r = cubicBezierCurve(p0, p1, p2, target);
 
-    injecting_mouse_events = true;
-
     for (size_t i=0; i<r.size(); ++i) {
         if (absolute) {
             if (!injectMouseEvent(r[i], MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE)) {
@@ -140,7 +133,7 @@ bool KeyboardMouse::mouseMove(Point target, bool absolute)
         Sleep(MOUSE_SAMPLING_TIME + uni_dist(generator));
     }
 
-    injecting_mouse_events = false;
+    SetCursorPos(target.x, target.y);
 
     return true;
 }
@@ -176,8 +169,6 @@ bool KeyboardMouse::mouseClick(MouseKey key)
 
     Point p;
 
-    injecting_mouse_events = true;
-
     if (!injectMouseEvent(p, flags_down)) {
         return false;
     }
@@ -186,7 +177,6 @@ bool KeyboardMouse::mouseClick(MouseKey key)
 
     auto r = injectMouseEvent(p, flags_up);
 
-    injecting_mouse_events = false;
     return r;
 }
 

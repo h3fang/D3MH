@@ -39,7 +39,6 @@ HEADERS  += minimap.h \
     datatypes/scene.h \
     datatypes/actor.h \
     datatypes/sno.h \
-    datatypes/snoenum.h \
     datatypes/levelarea.h \
     datatypes/marker.h \
     datatypes/ui.h \
@@ -49,12 +48,14 @@ HEADERS  += minimap.h \
     modules/snocache.h \
     modules/helpers.h \
     modules/autoloot.h \
-    utils/helper.h \
     utils/memoryreader.h \
     utils/pointer.h \
     utils/hook.h \
     utils/keyboardmouse.h \
-    utils/point.h
+    utils/point.h \
+    datatypes/enums.h \
+    datatypes/attributedescriptor.h \
+    utils/helpers.h
 
 RC_FILE = default.rc
 

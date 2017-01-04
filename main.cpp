@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "datatypes/structs.h"
-#include "utils/helper.h"
+#include "utils/helpers.h"
 
 int main(int argc, char *argv[])
 {

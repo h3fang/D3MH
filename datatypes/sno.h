@@ -1,7 +1,7 @@
 #ifndef D3MH_SNO_H
 #define D3MH_SNO_H
 
-#include "snoenum.h"
+#include "enums.h"
 #include "types.h"
 
 namespace D3 {

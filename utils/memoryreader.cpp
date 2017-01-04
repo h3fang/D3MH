@@ -1,7 +1,7 @@
 #include "memoryreader.h"
 
 #include <stdio.h>
-#include "helper.h"
+#include "helpers.h"
 
 MemoryReader::MemoryReader(const wchar_t *name, int size):
     process(NULL),

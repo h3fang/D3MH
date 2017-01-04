@@ -3,27 +3,23 @@
 #include <QDebug>
 
 std::vector<MSLLHOOKSTRUCT> mouse_points;
-std::atomic<bool> injecting_mouse_events;
-std::atomic<bool> injecting_keyboard_events;
+std::atomic<bool> block_mouse_events;
+std::atomic<bool> block_keyboard_events;
 
 HHOOK llmh, llkbh;
 
 LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    static POINT last_p = {0, 0};
-    static DWORD last_time = 0;
-
     if (nCode < 0) {
         return CallNextHookEx(llmh, nCode, wParam, lParam);
     }
 
     MSLLHOOKSTRUCT *p = (MSLLHOOKSTRUCT*)lParam;
 
-    qDebug("MOUSE - type: 0x%X, x: %ld, y: %ld, flags: %ld, time: %ld, speed: %f",
-        wParam, p->pt.x, p->pt.y, p->flags, p->time,
-           sqrt((p->pt.x - last_p.x)*(p->pt.x - last_p.x) + (p->pt.y - last_p.y)*(p->pt.y - last_p.y))/(p->time-last_time)*1000.0 );
+//    qDebug("MOUSE - type: 0x%X, x: %ld, y: %ld, flags: %ld, time: %ld", wParam, p->pt.x, p->pt.y, p->flags, p->time);
 
-    if (!(p->flags & LLMHF_INJECTED) && injecting_mouse_events) {
+    // block real input while injecting
+    if (!(p->flags & LLMHF_INJECTED) && block_mouse_events) {
         return 1;
     }
 
@@ -33,9 +29,6 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
     }
 
 //    mouse_points.push_back(*p);
-
-    last_p = p->pt;
-    last_time = p->time;
 
     return CallNextHookEx(llmh, nCode, wParam, lParam);
 }
@@ -47,9 +40,10 @@ LRESULT CALLBACK LowLevelKeybdProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     KBDLLHOOKSTRUCT *p = (KBDLLHOOKSTRUCT*)lParam;
 
-    qDebug("KEYBOARD - type: 0x%X, vk:%lu, sc:%lu, flags: %ld, time: %ld", wParam, p->vkCode, p->scanCode, p->flags, p->time);
+//    qDebug("KEYBOARD - type: 0x%X, vk:%lu, sc:%lu, flags: %ld, time: %ld", wParam, p->vkCode, p->scanCode, p->flags, p->time);
 
-    if (!(p->flags & LLKHF_INJECTED) && injecting_keyboard_events) {
+    // block real input while injecting
+    if (!(p->flags & LLKHF_INJECTED) && block_keyboard_events) {
         return 1;
     }
 
@@ -63,8 +57,8 @@ LRESULT CALLBACK LowLevelKeybdProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 Hook::Hook()
 {
-    injecting_mouse_events = false;
-    injecting_keyboard_events = false;
+    block_mouse_events = false;
+    block_keyboard_events = false;
 
     mouse_points.reserve(200);
 

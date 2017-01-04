@@ -8,7 +8,7 @@
 
 #include "point.h"
 
-const float MOUSE_SAMPLING_TIME = 15.0f;
+const float MOUSE_SAMPLING_TIME = 15.0f; // ms
 const float MOUSE_AVERAGE_SPEED = 20.0f;
 const float dr = 0.01;
 

@@ -19,19 +19,19 @@ namespace D3 {
 std::unordered_map<uint, SceneSnoDataPtr> NavMesh::sceneSnoData;
 
 SceneSnoData::SceneSnoData() :
-    sno_id(INVALID_SNO_ID),
+    sno_id(INVALID_ID),
     loaded(false)
 {
 }
 
 SceneSnoData::SceneSnoData(uint sno_id) :
-    sno_id(INVALID_SNO_ID)
+    sno_id(INVALID_ID)
 {
     loaded = load(sno_id);
 }
 
 SceneSnoData::SceneSnoData(SceneSno* sno_ptr) :
-    sno_id(INVALID_SNO_ID),
+    sno_id(INVALID_ID),
     loaded(false)
 {
     SceneSno s = Pointer<SceneSno>()(sno_ptr);
@@ -63,7 +63,7 @@ SceneSnoData::SceneSnoData(SceneSno* sno_ptr) :
 }
 
 SceneSnoData::SceneSnoData(SceneSnoFile *s) :
-    sno_id(INVALID_SNO_ID),
+    sno_id(INVALID_ID),
     loaded(false)
 {
     sno_id = s->sceneSno.header.x00_SnoId;
@@ -93,7 +93,7 @@ SceneSnoData::~SceneSnoData()
 
 bool SceneSnoData::save()
 {
-    if (sno_id == INVALID_SNO_ID || cells.empty()) {
+    if (sno_id == INVALID_ID || cells.empty()) {
         return false;
     }
 
@@ -140,10 +140,10 @@ bool SceneSnoData::load(uint sno_id)
 }
 
 SceneData::SceneData() :
-    id(INVALID_SNO_ID),
-    sno_id(INVALID_SNO_ID),
-    navmesh_id(INVALID_SNO_ID),
-    world_sno_id(INVALID_SNO_ID),
+    id(INVALID_ID),
+    sno_id(INVALID_ID),
+    navmesh_id(INVALID_ID),
+    world_sno_id(INVALID_ID),
     min(Vec2{0, 0}),
     max(Vec2{0, 0})
 {
@@ -168,7 +168,7 @@ SceneData::SceneData(const SceneRevealInfo &s)
     id = s.x04_SceneId_;
     sno_id = s.x00_SceneSnoId;
     navmesh_id = s.x00_SceneSnoId; // for convenience
-    world_sno_id = INVALID_SNO_ID;
+    world_sno_id = INVALID_ID;
 
     min.x = s.x10_MinX;
     min.y = s.x14_MinY;
@@ -190,7 +190,7 @@ SceneSnoDataPtr SceneData::findSceneSnoData()
 
 NavMesh::NavMesh(Engine *e) :
     engine(e),
-    current_world_sno_id(INVALID_SNO_ID)
+    current_world_sno_id(INVALID_ID)
 {
     loadSceneSnoFiles();
 }
@@ -282,7 +282,7 @@ void NavMesh::fetchScene()
 
         node_ptr = node.Next;
 
-        if (node.Value.x00_SceneSnoId == INVALID_SNO_ID ||
+        if (node.Value.x00_SceneSnoId == INVALID_ID ||
                 node.Value.x08_WorldId_ != world_id ||
                 node.Value.x18_MaxX <= node.Value.x10_MinX ||
                 node.Value.x1C_MaxY <= node.Value.x14_MinY) {
@@ -305,7 +305,7 @@ void NavMesh::fetchSceneSno()
                                                                      0);
 
     for (const auto & d : enumerate_container(c)) {
-        if(d.x00_Id == INVALID_SNO_ID || d.x07_SnoGroupId != (char)SnoGroupId_Scene){
+        if(d.x00_Id == INVALID_ID || d.x07_SnoGroupId != (char)SnoGroupId_Scene){
             continue;
         }
 

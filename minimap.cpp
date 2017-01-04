@@ -11,7 +11,7 @@
 #include <ctime>
 
 #include "utils/pointer.h"
-#include "utils/helper.h"
+#include "utils/helpers.h"
 
 float CANVAS_WIDTH = 1500.0f;
 const float CANVAS_HEIGHT = 1200.0f;
@@ -39,8 +39,7 @@ Minimap::Minimap(QWidget *parent) :
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint),
     d3Window(NULL),
     draw_minimap(false),
-    size_changed(false),
-    hotkey_id(0)
+    size_changed(false)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -54,6 +53,7 @@ Minimap::Minimap(QWidget *parent) :
     dir.mkdir("cache");
 
     engine = new D3::Engine();
+    autoLoot = new D3::AutoLoot(engine);
 
     registerHotKeys();
 
@@ -74,13 +74,16 @@ Minimap::Minimap(QWidget *parent) :
 
 Minimap::~Minimap()
 {
+    delete autoLoot;
     delete engine;
 
     if (d3Window) {
         CloseHandle(d3Window);
     }
 
-    UnregisterHotKey((HWND)winId(), hotkey_id);
+    for (int id: hotkey_ids) {
+        UnregisterHotKey((HWND)winId(), id);
+    }
 }
 
 void Minimap::paintEvent(QPaintEvent *)
@@ -116,8 +119,16 @@ void Minimap::resizeEvent(QResizeEvent *e)
 bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long */*result*/)
 {
     MSG* m = (MSG*)message;
-    if (m->message == WM_HOTKEY && HIWORD(m->lParam) == VK_TAB) {
-        draw_minimap = !draw_minimap;
+    if (m->message == WM_HOTKEY) {
+        if (HIWORD(m->lParam) == VK_F1) {
+            draw_minimap = !draw_minimap;
+        }
+        else if (HIWORD(m->lParam) == VK_F2) {
+            autoLoot->loot();
+        }
+        else if (HIWORD(m->lParam) == VK_END && LOWORD(m->lParam) == MOD_CONTROL) {
+            this->close();
+        }
     }
 
     return false;
@@ -182,6 +193,10 @@ void Minimap::drawMinimap(QPainter *p)
 
     int radius = 3;
     for (const D3::ActorCommonData& acd : engine->acds) {
+        if (acd.x000_Id == D3::INVALID_ID) {
+            continue;
+        }
+
         if (D3::isMonster(acd)) {
             switch ((D3::MonsterQuality)acd.x0B8_MonsterQuality) {
             case D3::MonsterQuality::Hireling : {
@@ -220,7 +235,7 @@ void Minimap::drawMinimap(QPainter *p)
             p->drawEllipse(QPointF(acd.x0D0_WorldPosX, acd.x0D4_WorldPosY), radius, radius);
         }
 
-        if (acd.x184_ActorType == D3::ActorType_Gizmo) {
+        if (acd.x184_ActorType == int(D3::ActorType::Gizmo)) {
             if (D3::isShrine(acd)) {
                 p->setPen(QPen(QColor(255, 255, 0, 196), 3));
                 p->setBrush(Qt::transparent);
@@ -285,13 +300,25 @@ QRect Minimap::getD3ClientRect()
     return QRect(QPoint(r.left, r.top), QPoint(r.right, r.bottom));
 }
 
-bool Minimap::registerHotKeys()
-{
-    hotkey_id = GlobalAddAtomA("DEMH");
-    if (!RegisterHotKey((HWND)winId(), hotkey_id, 0, VK_TAB)) {
-        qDebug("Failed to register hotkeys");
+bool Minimap::registerHotkey(const char* name, unsigned int key, unsigned int mods) {
+    int id = GlobalAddAtomA(name);
+    if (!RegisterHotKey((HWND)winId(), id, mods, key)) {
+        qDebug("Failed to register hotkey: %s", name);
         return false;
     }
+    else {
+        hotkey_ids.push_back(id);
+        return true;
+    }
+}
 
-    return true;
+bool Minimap::registerHotKeys()
+{
+    bool result = true;
+
+    result = registerHotkey("DEMH_mm", VK_F1);
+    result = registerHotkey("DEMH_al", VK_F2);
+    result = registerHotkey("DEMH_quit", VK_END, MOD_CONTROL);
+
+    return result;
 }
