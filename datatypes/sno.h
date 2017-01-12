@@ -115,7 +115,7 @@ public:
     DataPtr2 BorderData;		// 0x080
 };
 
-//sizeof = 0x210
+//sizeof = 0x218 = 536
 class SceneSno
 {
 public:
@@ -134,8 +134,10 @@ public:
     DataPtr2 MapTrigEvent;		// 0x268
     uint pad_170[4];			// 0x270
     NavZoneDef NavZone;			// 0x180
-    uint SNOAppearance;        // 0x208
-    uint SNOPhysMesh;			// 0x20C
+    float x208;
+    uint SNOAppearance;        // 0x20C
+    uint SNOPhysMesh;			// 0x210
+    uint unknown_x21C;			// 0x21C
 };
 
 class SceneSnoFile
@@ -156,7 +158,7 @@ public:
     uint x0C_pSNOAddr;         // 0x00C
 };
 
-// SizeOf = 0x84;
+// SizeOf = 0x7C;
 class SnoGroupManager
 {
 public:
@@ -176,16 +178,14 @@ public:
     int x50;
     int x54;
     int x58;
-    int x5C;
-    int x60;
-    int x64_Limit;
-    int x68_ItemSize;
-    int x6C_MaxCacheSize;
-    int x70_EstCacheSize;
-    void* x74_Ptr_DataType;
-    int x78_Counter;
-    void* x7C;
-    int x80_Neg1_InvalidSnoId; // -1 or a group specific Axe_Bad_Data ID
+    int x5C_Limit;
+    int x60_ItemSize;
+    int x64_MaxCacheSize;
+    int x68_EstCacheSize;
+    void* x6C_Ptr_DataType;
+    int x70_Counter;
+    void* x74;
+    int x78_Neg1_InvalidSnoId; // -1 or a group specific Axe_Bad_Data ID
 };
 
 } // namespace D3

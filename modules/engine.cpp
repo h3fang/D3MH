@@ -82,7 +82,7 @@ bool Engine::isObjectManagerOnNewFrame()
 void Engine::update_acds()
 {
     // NOTE:offset
-    ExpandableContainer<ActorCommonData> c = Pointer<ExpandableContainer<ActorCommonData>>()(Addr_ObjectManager, 0x798 + 0x158, 0, 0);
+    ExpandableContainer<ActorCommonData> c = Pointer<ExpandableContainer<ActorCommonData>>()(Addr_ObjectManager, 0x7C8 + 0x158, 0, 0);
     acds = enumerate_expandable_container(c);
 }
 

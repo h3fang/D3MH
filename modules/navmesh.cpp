@@ -259,7 +259,7 @@ void NavMesh::fetchScene()
 {
     // NOTE:offset
     uint world_sno_id = engine->localData.x0C_WorldSnoId;
-    uint world_id = Pointer<uint>()(Addr_ObjectManager, 0x790, 0x38);;
+    uint world_id = Pointer<uint>()(Addr_ObjectManager, 0x7B8, 0x38);;
 
     if(world_sno_id != current_world_sno_id){
         current_world_sno_id = world_sno_id;
