@@ -12,19 +12,20 @@
 namespace D3 {
 
 // NOTE:offset
+// 2.4.3.43048
 enum Addr
 {
-    Addr_SnoGroupByCode = 0x01C13C90,
-    Addr_SnoGroups = 0x01C13C8C,
-    Addr_ObjectManager = 0x01C13E98,
-    Addr_ObjectManagerPristine = 0x01C13E9C,
-    Addr_LocalData = 0x01C15148,
-    Addr_LevelArea = 0x01B9E68C,
-    Addr_LevelAreaName = 0x01B9E6BC,
-    Addr_MapActId = 0x01B9EA00,
-    Addr_ContainerManager = 0x01CD6A7C,
-    Addr_ApplicationLoopCount = 0x01C13F14,
-    Addr_AttributeDescriptors = 0x01C66660,
+    Addr_SnoGroupByCode = 0x01C12C90,
+    Addr_SnoGroups = 0x01C12C8C,
+    Addr_ObjectManager = 0x01C12E98,
+    Addr_ObjectManagerPristine = 0x01C12E9C,
+    Addr_LocalData = 0x01C14148,
+    Addr_LevelArea = 0x01B9D68C,
+    Addr_LevelAreaName = 0x01B9D6BC,
+    Addr_MapActId = 0x01B9DA00,
+    Addr_ContainerManager = 0x01CD5A7C,
+    Addr_ApplicationLoopCount = 0x01C12F14,
+    Addr_AttributeDescriptors = 0x01C65660,
 };
 
 class Engine
