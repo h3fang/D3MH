@@ -91,9 +91,9 @@ std::vector<Item> AutoLoot::getItemsToLoot()
 
     for (const ActorCommonData& acd : engine->acds) {
         if (acd.x000_Id == INVALID_ID ||
-                acd.x184_ActorType != int(ActorType::Item) ||
+                acd.x17C_ActorType != int(ActorType::Item) ||
                 acd.x114_ItemLocation != ItemLoc_UnknownLoc ||
-                acd.x180_GizmoType != int(GizmoType::Item) ||
+                acd.x178_GizmoType != int(GizmoType::Item) ||
                 (d = distance(x, y, z, acd.x0D0_WorldPosX, acd.x0D4_WorldPosY, acd.x0D8_WorldPosZ))> MAX_LOOT_RADIUS) {
             continue;
         }

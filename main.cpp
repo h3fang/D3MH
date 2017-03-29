@@ -14,10 +14,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (!terminateBN()) {
-        fprintf(stderr, "Failed to terminateBN()\n");
-        return 2;
-    }
+//    if (!terminateBN()) {
+//        fprintf(stderr, "Failed to terminateBN()\n");
+//        return 2;
+//    }
 
     timeBeginPeriod(1);
 
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     Minimap w;
     w.show();
 
-    qDebug("sizeof ObjectManager %#x %#x", sizeof(D3::ObjectManager), offsetof(D3::ObjectManager, x9C8_Scenes));
+    qDebug("sizeof ObjectManager %#x %#x", sizeof(D3::ObjectManager), offsetof(D3::ObjectManager, x9B8_Scenes));
     qDebug("sizeof ActorCommonData %#x", sizeof(D3::ActorCommonData));
     qDebug("sizeof Container %#x", sizeof(D3::Container<void>));
     qDebug("sizeof ExpandableContainer %#x", sizeof(D3::ExpandableContainer<void>));

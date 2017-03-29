@@ -53,11 +53,11 @@ bool isMaterial(const ActorCommonData& acd) {
 }
 
 bool isMonster(const ActorCommonData &acd) {
-    return acd.x184_ActorType == int(D3::ActorType::Monster) &&
+    return acd.x17C_ActorType == int(D3::ActorType::Monster) &&
             acd.x090_ActorSnoId != D3::INVALID_ID &&
-            acd.x188_Hitpoints > 0.9 &&
-            (acd.x198_Flags_Is_Trail_Proxy_Etc & 1) == 0 &&
-            acd.x190_TeamId == 10;
+            acd.x180_Hitpoints > 0.9 &&
+            (acd.x190_Flags_Is_Trail_Proxy_Etc & 1) == 0 &&
+            acd.x188_TeamId == 10;
 }
 
 bool isTreasureGoblin(const ActorCommonData& acd) {

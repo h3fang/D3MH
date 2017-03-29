@@ -5,7 +5,7 @@
 
 namespace D3 {
 
-struct ActorCommonData{ // sizeof = 0x2F8
+struct ActorCommonData{ // sizeof = 0x2F0
     uint x000_Id;
     char x004_Name[0x80];
     int x084_ChestRelated;
@@ -43,17 +43,17 @@ struct ActorCommonData{ // sizeof = 0x2F8
     int x11C_ItemSlotY;
     int x120_FastAttribGroupId;
     int x124_Id_FastAttribGroupId;
-    uchar x128[0x180-0x128];
-    int x180_GizmoType;
-    int x184_ActorType;
-    float x188_Hitpoints;
-    int x18C_TeamIdOverride;
-    int x190_TeamId;
-    int _x194;
-    int x198_Flags_Is_Trail_Proxy_Etc;
-    int x19C_FollowPlayerIndex; // 7 = None
-    int x1A0_Flags_1IsFollower_4HasHP;
-    uchar x1A4[0x2F8-0x1A4];
+    uchar x128[0x178-0x128];
+    int x178_GizmoType;
+    int x17C_ActorType;
+    float x180_Hitpoints;
+    int x184_TeamIdOverride;
+    int x188_TeamId;
+    int _x18C;
+    int x190_Flags_Is_Trail_Proxy_Etc;
+    int x194_FollowPlayerIndex; // 7 = None
+    int x198_Flags_1IsFollower_4HasHP;
+    uchar x19C[0x2F0-0x19C];
 };
 
 } // namespace D3

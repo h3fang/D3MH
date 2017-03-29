@@ -38,7 +38,7 @@ std::string random_string(const int len) {
 Minimap::Minimap(QWidget *parent) :
     QWidget(parent, Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint),
     d3Window(NULL),
-    draw_minimap(false),
+    draw_minimap(true),
     size_changed(false)
 {
     setAttribute(Qt::WA_TranslucentBackground);
@@ -124,7 +124,7 @@ bool Minimap::nativeEvent(const QByteArray &/*eventType*/, void *message, long *
             draw_minimap = !draw_minimap;
         }
         else if (HIWORD(m->lParam) == VK_F2) {
-            autoLoot->loot();
+//            autoLoot->loot();
         }
         else if (HIWORD(m->lParam) == VK_END && LOWORD(m->lParam) == MOD_CONTROL) {
             this->close();
@@ -235,7 +235,7 @@ void Minimap::drawMinimap(QPainter *p)
             p->drawEllipse(QPointF(acd.x0D0_WorldPosX, acd.x0D4_WorldPosY), radius, radius);
         }
 
-        if (acd.x184_ActorType == int(D3::ActorType::Gizmo)) {
+        if (acd.x17C_ActorType == int(D3::ActorType::Gizmo)) {
             if (D3::isShrine(acd)) {
                 p->setPen(QPen(QColor(255, 255, 0, 196), 3));
                 p->setBrush(Qt::transparent);
